@@ -1,0 +1,45 @@
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# RDF and Semantic Web
+rdflib==7.0.0
+SPARQLWrapper==2.0.0
+owlrl==6.0.2
+
+# Data Integration
+requests==2.31.0
+httpx==0.26.0
+
+# Database
+pymongo==4.6.1
+redis==5.0.1
+
+# Visualization
+plotly==5.18.0
+matplotlib==3.8.2
+
+# Machine Learning for Recommendations
+scikit-learn==1.8.0
+numpy==2.4.0
+pandas==2.3.3
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.0
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+httpx==0.26.0
+
+# CORS
+fastapi-cors==0.0.6
+
+# Caching
+cachetools==5.3.2
+
+# Logging
+structlog==24.1.0
