@@ -55,17 +55,35 @@ class DataImporter:
             
             errors = []
             imported_count = 0
-            
+
+            aggregations = {}
+            for agg in root.findall('.//ore:Aggregation', ns):
+                aggregated_cho = agg.find('edm:aggregatedCHO', ns)
+                if aggregated_cho is not None:
+                    cho_id = aggregated_cho.get('{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource')
+                    aggregations[cho_id] = agg
+
             for artwork in root.findall('.//edm:ProvidedCHO', ns):
+                artwork_id = artwork.get('{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about')
+                aggregation = aggregations.get(artwork_id)
+
                 try:
-                    success = self._parse_edm_cho(artwork, ns)
+                
+                    if aggregation:
+                        success = self._parse_edm_cho(artwork, aggregation, ns)
+                    else:
+                        success = self._parse_edm_cho(artwork, None, ns)
+                    
                     if success:
                         imported_count += 1
                     else:
                         errors.append(f"Failed to import artwork with identifier: {artwork.find('dc:identifier', ns).text if artwork.find('dc:identifier', ns) is not None else 'unknown'}")
-                except Exception as e:
+            
+                except Exception as e:   
                     errors.append(f"Exception: {str(e)}")
                     logger.warning(f"Error processing Artworks: {e}")
+                    
+                
             logger.info(f"Imported {imported_count} artworks from EDM XML")
             
             return {
@@ -139,6 +157,7 @@ class DataImporter:
         entity_id = str(uuid4())
         entity_uri = f"{base_uri}attributes/{entity_id}"
         
+        logger.debug(f"Creating new entity of type {entity_type} with name {names[0]} and link {link}")
         if self.rdf_service.add_entity(entity_type, entity_uri, names[0], link):
             self.created_entities[entity_key] = entity_uri
             logger.info(f"Created new entity: {entity_key}")
@@ -147,7 +166,7 @@ class DataImporter:
         return None
         
 
-    def _parse_edm_cho(self, cho_element, namespaces: Dict[str, str]) -> bool:
+    def _parse_edm_cho(self, cho_element, agg, namespaces: Dict[str, str]) -> bool:
         """Parse a single EDM ProvidedCHO element (ARTWORK) with all additional information"""
         
         def get_text(element, tag, ns_key='dc'):
@@ -191,10 +210,12 @@ class DataImporter:
         material_aat = get_attr_text(cho_element, 'medium', 'dcterms')
         material_uri = self._find_or_create_entity('material', material_names, material_aat)
 
-        provider_wikidata_link = get_text(cho_element, 'provider', 'edm')
+
+
+        provider_wikidata_link = get_text(agg, 'provider', 'edm')
         provider_uri = self._find_or_create_entity('provider', [], provider_wikidata_link)
 
-        institute_name = get_text(cho_element, 'dataProvider', 'edm')
+        institute_name = get_text(agg, 'dataProvider', 'edm')
         institute_uri = self._find_or_create_entity('institute', [institute_name] if institute_name else [], None)
 
 

@@ -157,7 +157,7 @@ class RDFStoreService:
             return False
     
     def add_entity(self, entity_type: str, entity_uri: str, entity_name: str, entity_link: str) -> bool:
-        """Add artwork type to RDF store"""      
+        """Add artwork details entities to RDF store"""      
         try:
             crm = self.ns['crm']
             prov = self.ns['prov']
