@@ -5,15 +5,12 @@ Endpoints for managing artworks
 import structlog
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, Query, Request
-from app.services.helpers import wikidata_parser_for_artwork
-from app.services.external_data import DBpediaService, WikidataService, GettyService
+from app.services import wikidata_parser_for_artwork
+from app.services.external_data import WikidataService
 
 logger = structlog.get_logger()
 router = APIRouter()
-
-dbpedia = DBpediaService()
 wikidata = WikidataService()
-getty = GettyService()
 
 
 @router.get("/")
@@ -88,12 +85,12 @@ async def get_artwork(artwork_id: str, request: Request):
 async def wikidata_enrichment(artwork: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Helper function to enrich artwork data with Wikidata"""
     
-    if artwork.get('name') is None or artwork.get('name') == '':
+    if artwork.get('title') is None or artwork.get('title') == '':
         return artwork
     
     try:
         wikidata_response = {}
-        result = await wikidata.search_wikidata(artwork.get('name'))
+        result = await wikidata.search_wikidata(artwork.get('title'))
         
         if result and 'search' in result and len(result['search']) > 0:
             wikidata_id = result['search'][0]['id']

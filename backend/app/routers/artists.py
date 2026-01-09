@@ -7,14 +7,11 @@ import structlog
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, Query, Request
 from app.services import wikidata_parser_for_artist
-from app.services.external_data import DBpediaService, WikidataService, GettyService
+from app.services.external_data import WikidataService
 
 logger = structlog.get_logger()
 router = APIRouter()
-
-dbpedia = DBpediaService()
 wikidata = WikidataService()
-getty = GettyService()
 
 
 @router.get("/")

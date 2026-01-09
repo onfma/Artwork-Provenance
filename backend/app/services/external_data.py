@@ -56,6 +56,35 @@ class WikidataService:
         
         except Exception as e:
             logger.error(f"HTTP error getting Wikidata entity {entity_id}: {e}")
+            return None
+    
+    async def get_entity_label(self, entity_id: str) -> Optional[str]:
+        """Get the label (name) for a Wikidata entity by ID"""
+        url = "https://www.wikidata.org/w/api.php"
+        params = {
+            'action': 'wbgetentities',
+            'ids': entity_id,
+            'props': 'labels',
+            'languages': f'ro|en',
+            'format': 'json'
+        }
+        
+        try:
+            data = await self.get_entity(entity_id) 
+            entity_data = data.get('entities', {}).get(entity_id, {})
+            labels = entity_data.get('labels', {})
+            
+            if 'ro' in labels:
+                return labels['ro']['value']
+            elif 'en' in labels:
+                return labels['en']['value']
+            elif labels:
+                return next(iter(labels.values()))['value']
+            
+            return None
+        
+        except Exception as e:
+            logger.error(f"HTTP error getting label for entity {entity_id}: {e}")
             return None    
 
 
