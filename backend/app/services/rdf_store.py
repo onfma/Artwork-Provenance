@@ -925,3 +925,21 @@ class RDFStoreService:
         except Exception as e:
             logger.error(f"Error querying events for artwork: {e}")
             return []
+        
+
+    ##########################
+    # General Querying [SPARQL]
+    ##########################
+
+    def execute_sparql(self, query: str) -> Any:
+        """Execute arbitrary SPARQL query against RDF store"""
+        try:
+            results = self.graph.query(query)
+            logger.info("Executed SPARQL query successfully")
+            return results
+        except Exception as e:
+            logger.error(f"Error executing SPARQL query: {e}")
+            return None
+
+
+

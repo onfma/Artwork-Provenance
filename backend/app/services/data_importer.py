@@ -144,11 +144,11 @@ class DataImporter:
         
         return None
     
-    def _find_or_create_entity(self, entity_type: str, names: list, link: str = None) -> str:
-        if not names:
-            names = ["Unknown"]
+    def _find_or_create_entity(self, entity_type: str, name: str, link: str = None) -> str:
+        if not name:
+            name = "Unknown"
         
-        entity_key = names[0], link
+        entity_key = name, link
         
         if entity_key in self.created_entities:
             logger.debug(f"Reusing existing entity: {entity_key}")
@@ -157,7 +157,7 @@ class DataImporter:
         entity_id = str(uuid4())
         entity_uri = f"{base_uri}attributes/{entity_id}"
         
-        if self.rdf_service.add_entity(entity_type, entity_uri, names[0], link):
+        if self.rdf_service.add_entity(entity_type, entity_uri, name, link):
             self.created_entities[entity_key] = entity_uri
             logger.info(f"Created new entity: {entity_key}")
             return entity_uri
@@ -168,10 +168,6 @@ class DataImporter:
     def _parse_edm_cho(self, cho_element, agg, namespaces: Dict[str, str]) -> bool:
         """Parse a single EDM ProvidedCHO element (ARTWORK) with all additional information"""
         
-        def get_text(element, tag, ns_key='dc'):
-            elem = element.find(f'{ns_key}:{tag}', namespaces)
-            return elem.text if elem is not None else None
-        
         def get_attr(element, tag, ns_key='dc'):
             for el in element.findall(f'.//{ns_key}:{tag}', namespaces):
                 val = el.get('{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource')
@@ -179,8 +175,8 @@ class DataImporter:
                     return val
             return None
         
-        def get_all_text(element, tag, ns_key='dc'):
-            return [e.text for e in element.findall(f'{ns_key}:{tag}', namespaces) if e.text]
+        def get_text(element, tag, ns_key='dc'):
+            return ", ".join([e.text for e in element.findall(f'{ns_key}:{tag}', namespaces) if e.text])
         
 
         inventoryNumber = get_text(cho_element, 'identifier', 'dc')
@@ -191,24 +187,24 @@ class DataImporter:
         creator_ulan = get_attr(cho_element, 'creator', 'dc')
         artist_uri = self._find_or_create_artist(creator_name, creator_ulan)
         
-        location_names = get_all_text(cho_element, 'spatial', 'dcterms')
+        location_name = get_text(cho_element, 'spatial', 'dcterms')
         location_tgn = get_attr(cho_element, 'spatial', 'dcterms')
-        location_uri = self._find_or_create_location(location_names, location_tgn)
+        location_uri = self._find_or_create_location(location_name, location_tgn)
 
 
 
-        type_names = get_all_text(cho_element, 'type', 'dc')
+        type_name = get_text(cho_element, 'type', 'dc')
         type_aat = get_attr(cho_element, 'type', 'dc')
-        type_uri = self._find_or_create_entity('type', type_names, type_aat)
+        type_uri = self._find_or_create_entity('type', type_name, type_aat)
 
         subject_name = get_text(cho_element, 'subject', 'dc')
         subject_aat = get_attr(cho_element, 'subject', 'dc')
-        subject_uri = self._find_or_create_entity('subject', [subject_name] if subject_name else [], subject_aat)
+        subject_uri = self._find_or_create_entity('subject', subject_name, subject_aat)
         
-        material_names = get_all_text(cho_element, 'medium', 'dcterms')
+        material_name = get_text(cho_element, 'medium', 'dcterms')
         material_aat = get_attr(cho_element, 'medium', 'dcterms')
-        material_uri = self._find_or_create_entity('material', material_names, material_aat)
-
+        material_uri = self._find_or_create_entity('material', material_name, material_aat)
+        
         image_url = None
         provider_wikidata_link = None
         institute_name = None
@@ -218,8 +214,8 @@ class DataImporter:
             institute_name = get_text(agg, 'dataProvider', 'edm')
             image_url = get_attr(agg, 'isShownBy', 'edm')
 
-        provider_uri = self._find_or_create_entity('provider', [], provider_wikidata_link) if provider_wikidata_link else None
-        institute_uri = self._find_or_create_entity('institute', [institute_name] if institute_name else [], None) if institute_name else None
+        provider_uri = self._find_or_create_entity('provider', "", provider_wikidata_link) if provider_wikidata_link else None
+        institute_uri = self._find_or_create_entity('institute', institute_name, None) if institute_name else None
 
 
 
@@ -228,9 +224,9 @@ class DataImporter:
         artwork_data = {
             'inventoryNumber': inventoryNumber,
             'title': get_text(cho_element, 'title', 'dc'),
-            'description': get_all_text(cho_element, 'description', 'dc'),
+            'description': get_text(cho_element, 'description', 'dc'),
             'creationDate': get_text(cho_element, 'created', 'dcterms'),
-            'dimensions': get_all_text(cho_element, 'extent', 'dcterms'),
+            'dimensions': get_text(cho_element, 'extent', 'dcterms'),
             'imageURL': image_url,
             'type_uri': type_uri,
             'subject_uri': subject_uri,
