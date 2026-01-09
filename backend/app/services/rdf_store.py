@@ -568,3 +568,360 @@ class RDFStoreService:
         except Exception as e:
             logger.error(f"Error querying artist details: {e}")
             return None
+
+
+    def get_all_locations(self) -> list:
+        """Query all locations from RDF store"""
+        query = """
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        
+        SELECT ?location ?name ?tgn
+        WHERE {
+            ?location a prov:Location ;
+                      a crm:E53_Place ;
+                      rdfs:label ?name .
+            OPTIONAL { ?location owl:sameAs ?tgn . FILTER(CONTAINS(STR(?tgn), "tgn")) }
+        }
+        ORDER BY ?name
+        """
+        
+        try:
+            results = self.graph.query(query)
+            locations = []
+            
+            for row in results:
+                location_uri = str(row.location)
+                location_id = location_uri.split('/')[-1]
+                
+                location_data = {
+                    'id': location_id,
+                    'uri': location_uri,
+                    'name': str(row.name),
+                    'getty': str(row.tgn) if row.tgn else None
+                }
+                locations.append(location_data)
+            
+            logger.info(f"Retrieved {len(locations)} locations from RDF store")
+            return locations
+            
+        except Exception as e:
+            logger.error(f"Error querying locations: {e}")
+            return []
+    
+    def get_location(self, location_uri: str) -> Dict[str, Any]:
+        """Query specific location details from RDF store including all associated artworks"""
+        query = f"""
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        
+        SELECT ?name ?tgn ?artwork ?artworkTitle ?artworkIdentifier ?artworkImageURL
+        WHERE {{
+            <{location_uri}> a prov:Location ;
+                            a crm:E53_Place ;
+                            rdfs:label ?name .
+            
+            OPTIONAL {{
+                <{location_uri}> owl:sameAs ?tgn .
+                FILTER(CONTAINS(STR(?tgn), "tgn"))
+            }}
+            
+            OPTIONAL {{
+                ?event crm:P7_took_place_at <{location_uri}> ;
+                       crm:P108_has_produced ?artwork .
+                
+                OPTIONAL {{
+                    ?artwork crm:P102_has_title ?titleNode .
+                    ?titleNode crm:P190_has_symbolic_content ?artworkTitle .
+                }}
+                
+                OPTIONAL {{
+                    ?artwork crm:P1_is_identified_by ?id .
+                    ?id crm:P190_has_symbolic_content ?artworkIdentifier .
+                }}
+                
+                OPTIONAL {{
+                    ?artwork foaf:depiction ?artworkImageURL .
+                }}
+            }}
+        }}
+        """
+        
+        try:
+            results = self.graph.query(query)
+            
+            if not results:
+                return None
+            
+            location_data = {
+                'id': location_uri.split('/')[-1],
+                'uri': location_uri,
+                'name': None,
+                'getty': None,
+                'artworks': []
+            }
+            
+            artworks_dict = {}
+            
+            for row in results:
+                if row.name and not location_data['name']:
+                    location_data['name'] = str(row.name)
+                if row.tgn and not location_data['getty']:
+                    location_data['getty'] = str(row.tgn)
+                
+                if row.artwork:
+                    artwork_uri = str(row.artwork)
+                    artwork_id = artwork_uri.split('/')[-1]
+                    
+                    if artwork_id not in artworks_dict:
+                        artworks_dict[artwork_id] = {
+                            'id': artwork_id,
+                            'uri': artwork_uri,
+                            'title': str(row.artworkTitle) if row.artworkTitle else None,
+                            'imageURL': str(row.artworkImageURL) if row.artworkImageURL else None,
+                            'inventoryNumber': str(row.artworkIdentifier) if row.artworkIdentifier else None
+                        }
+            
+            location_data['artworks'] = list(artworks_dict.values())
+            
+            logger.info(f"Retrieved location details for: {location_uri} with {len(location_data['artworks'])} artworks")
+            return location_data
+            
+        except Exception as e:
+            logger.error(f"Error querying location details: {e}")
+            return None
+        
+    
+    def get_all_events(self) -> list:
+        """Query all provenance events from RDF store"""
+        query = """
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        
+        SELECT ?event ?type ?artwork ?artworkTitle ?artist ?artistName ?location ?locationName ?date
+        WHERE {
+            ?event a prov:Activity ;
+                   a crm:E12_Production ;
+                   rdfs:label ?type .
+            
+            OPTIONAL {
+                ?event crm:P108_has_produced ?artwork .
+                OPTIONAL {
+                    ?artwork crm:P102_has_title ?titleNode .
+                    ?titleNode crm:P190_has_symbolic_content ?artworkTitle .
+                }
+            }
+            
+            OPTIONAL {
+                ?event crm:P14_carried_out_by ?artist .
+                ?artist foaf:name ?artistName .
+            }
+            
+            OPTIONAL {
+                ?event crm:P7_took_place_at ?location .
+                ?location rdfs:label ?locationName .
+            }
+            
+            OPTIONAL {
+                ?event crm:P4_has_time_span ?date .
+            }
+        }
+        ORDER BY ?date
+        """
+        
+        try:
+            results = self.graph.query(query)
+            events = []
+            
+            for row in results:
+                event_uri = str(row.event)
+                event_id = event_uri.split('/')[-1]
+                
+                event_data = {
+                    'id': event_id,
+                    'uri': event_uri,
+                    'type': str(row.type) if row.type else None,
+                    'artwork': {
+                        'uri': str(row.artwork) if row.artwork else None,
+                        'title': str(row.artworkTitle) if row.artworkTitle else None
+                    } if row.artwork else None,
+                    'artist': {
+                        'uri': str(row.artist) if row.artist else None,
+                        'name': str(row.artistName) if row.artistName else None
+                    } if row.artist else None,
+                    'location': {
+                        'uri': str(row.location) if row.location else None,
+                        'name': str(row.locationName) if row.locationName else None
+                    } if row.location else None,
+                    'date': str(row.date) if row.date else None
+                }
+                events.append(event_data)
+            
+            logger.info(f"Retrieved {len(events)} provenance events from RDF store")
+            return events
+            
+        except Exception as e:
+            logger.error(f"Error querying provenance events: {e}")
+            return []
+        
+    def get_event(self, event_uri: str) -> Dict[str, Any]:
+        """Query specific provenance event details from RDF store"""
+        query = f"""
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        
+        SELECT ?type ?artwork ?artworkTitle ?artworkIdentifier ?artworkImageURL
+               ?artist ?artistName ?location ?locationName ?date
+        WHERE {{
+            <{event_uri}> a prov:Activity ;
+                         a crm:E12_Production ;
+                         rdfs:label ?type .
+            
+            OPTIONAL {{
+                <{event_uri}> crm:P108_has_produced ?artwork .
+                OPTIONAL {{
+                    ?artwork crm:P102_has_title ?titleNode .
+                    ?titleNode crm:P190_has_symbolic_content ?artworkTitle .
+                }}
+                OPTIONAL {{
+                    ?artwork crm:P1_is_identified_by ?id .
+                    ?id crm:P190_has_symbolic_content ?artworkIdentifier .
+                }}
+                OPTIONAL {{
+                    ?artwork foaf:depiction ?artworkImageURL .
+                }}
+            }}
+            
+            OPTIONAL {{
+                <{event_uri}> crm:P14_carried_out_by ?artist .
+                ?artist foaf:name ?artistName .
+            }}
+            
+            OPTIONAL {{
+                <{event_uri}> crm:P7_took_place_at ?location .
+                ?location rdfs:label ?locationName .
+            }}
+            
+            OPTIONAL {{
+                <{event_uri}> crm:P4_has_time_span ?date .
+            }}
+        }}
+        """
+        
+        try:
+            results = self.graph.query(query)
+            
+            if not results:
+                return None
+            
+            event_data = {
+                'id': event_uri.split('/')[-1],
+                'uri': event_uri,
+                'type': None,
+                'artwork': None,
+                'artist': None,
+                'location': None,
+                'date': None
+            }
+            
+            for row in results:
+                if row.type:
+                    event_data['type'] = str(row.type)
+                if row.artwork:
+                    event_data['artwork'] = {
+                        'uri': str(row.artwork),
+                        'title': str(row.artworkTitle) if row.artworkTitle else None,
+                        'inventoryNumber': str(row.artworkIdentifier) if row.artworkIdentifier else None,
+                        'imageURL': str(row.artworkImageURL) if row.artworkImageURL else None
+                    }
+                if row.artist:
+                    event_data['artist'] = {
+                        'uri': str(row.artist),
+                        'name': str(row.artistName) if row.artistName else None
+                    }
+                if row.location:
+                    event_data['location'] = {
+                        'uri': str(row.location),
+                        'name': str(row.locationName) if row.locationName else None
+                    }
+                if row.date:
+                    event_data['date'] = str(row.date)
+            
+            logger.info(f"Retrieved event details for: {event_uri}")
+            return event_data
+            
+        except Exception as e:
+            logger.error(f"Error querying event details: {e}")
+            return None
+    
+    def get_provenance_chain(self, artwork_uri: str) -> list:
+        """Query all provenance events for a specific artwork from RDF store"""
+        query = f"""
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        
+        SELECT ?event ?type ?artist ?artistName ?location ?locationName ?date
+        WHERE {{
+            ?event a prov:Activity ;
+                   a crm:E12_Production ;
+                   rdfs:label ?type ;
+                   crm:P108_has_produced <{artwork_uri}> .
+            
+            OPTIONAL {{
+                ?event crm:P14_carried_out_by ?artist .
+                ?artist foaf:name ?artistName .
+            }}
+            
+            OPTIONAL {{
+                ?event crm:P7_took_place_at ?location .
+                ?location rdfs:label ?locationName .
+            }}
+            
+            OPTIONAL {{
+                ?event crm:P4_has_time_span ?date .
+            }}
+        }}
+        ORDER BY ?date
+        """
+        
+        try:
+            results = self.graph.query(query)
+            events = []
+            
+            for row in results:
+                event_uri = str(row.event)
+                event_id = event_uri.split('/')[-1]
+                
+                event_data = {
+                    'id': event_id,
+                    'uri': event_uri,
+                    'type': str(row.type) if row.type else None,
+                    'artist': {
+                        'uri': str(row.artist) if row.artist else None,
+                        'name': str(row.artistName) if row.artistName else None
+                    } if row.artist else None,
+                    'location': {
+                        'uri': str(row.location) if row.location else None,
+                        'name': str(row.locationName) if row.locationName else None
+                    } if row.location else None,
+                    'date': str(row.date) if row.date else None
+                }
+                events.append(event_data)
+            
+            logger.info(f"Retrieved {len(events)} provenance events for artwork: {artwork_uri}")
+            return events
+            
+        except Exception as e:
+            logger.error(f"Error querying events for artwork: {e}")
+            return []

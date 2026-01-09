@@ -68,14 +68,7 @@ class ProvenanceEvent(BaseModel):
     uri: Optional[str] = Field(None, description="URI of the event")
     event_type: ProvenanceEventType = Field(..., description="Type of provenance event")
     date: Optional[str] = Field(None, description="Date of the event (ISO 8601)")
-    date_earliest: Optional[str] = Field(None, description="Earliest possible date")
-    date_latest: Optional[str] = Field(None, description="Latest possible date")
-    description: Optional[str] = Field(None, description="Description of the event")
-    from_agent: Optional[Agent] = Field(None, description="Previous owner/holder")
-    to_agent: Optional[Agent] = Field(None, description="New owner/holder")
     location: Optional[Location] = Field(None, description="Location where event occurred")
-    price: Optional[Dict[str, Any]] = Field(None, description="Transaction price (if applicable)")
-    documentation: List[str] = Field(default_factory=list, description="Supporting documentation URIs")
 
 
 class Artwork(BaseModel):
