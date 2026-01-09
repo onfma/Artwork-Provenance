@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import structlog
 
-from app.routers import artworks, provenance, sparql, recommendations, visualization, data_import
+from app.routers import artworks, artists, provenance, locations, sparql, recommendations, visualization
 from app.config import settings
 from app.services.rdf_store import RDFStoreService
 
@@ -30,11 +30,12 @@ app.add_middleware(
 )
 
 app.include_router(artworks.router, prefix="/api/artworks", tags=["Artworks"])
+app.include_router(artists.router, prefix="/api/artists", tags=["Artists"])
 app.include_router(provenance.router, prefix="/api/provenance", tags=["Provenance"])
+app.include_router(locations.router, prefix="/api/locations", tags=["Locations"])
 app.include_router(sparql.router, prefix="/api/sparql", tags=["SPARQL"])
 app.include_router(recommendations.router, prefix="/api/recommendations", tags=["Recommendations"])
 app.include_router(visualization.router, prefix="/api/visualization", tags=["Visualization"])
-app.include_router(data_import.router, prefix="/api/import", tags=["Data Import"])
 
 
 @app.on_event("startup")
@@ -67,7 +68,9 @@ async def root():
         "endpoints": {
             "docs": "/api/docs",
             "artworks": "/api/artworks",
+            "artists": "/api/artists",
             "provenance": "/api/provenance",
+            "locations": "/api/locations",
             "sparql": "/api/sparql",
             "recommendations": "/api/recommendations",
             "visualization": "/api/visualization"
@@ -76,7 +79,6 @@ async def root():
             "DBpedia",
             "Wikidata",
             "Getty Vocabularies (AAT, ULAN, TGN)",
-            "Europeana",
             "Romanian Heritage"
         ]
     }

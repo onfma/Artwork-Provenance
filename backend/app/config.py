@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     # Named Graph URIs
     BASE_GRAPH_URI: str = "http://arp-greatteam.org/heritage-provenance"
     ARTWORKS_GRAPH: str = "http://arp-greatteam.org/heritage-provenance/artworks"
+    ARTISTS_GRAPH: str = "http://arp-greatteam.org/heritage-provenance/artists"
     PROVENANCE_GRAPH: str = "http://arp-greatteam.org/heritage-provenance/provenance"
     ROMANIAN_GRAPH: str = "http://arp-greatteam.org/heritage-provenance/romanian"
     

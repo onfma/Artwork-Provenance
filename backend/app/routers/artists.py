@@ -22,6 +22,19 @@ async def list_artists(
     
     rdf_service = request.app.state.rdf_service
     
+    try:
+        artists = rdf_service.get_all_artists()
+        return {
+            "count": len(artists),
+            "artists": artists
+        }
+    except Exception as e:
+        logger.error(f"Error retrieving artists: {e}")
+        return {
+            "error": "Failed to retrieve artists",
+            "count": 0,
+            "artists": []
+        }
 
 @router.get("/{artist_id}")
 async def get_artist(artist_id: str, request: Request):
@@ -29,6 +42,24 @@ async def get_artist(artist_id: str, request: Request):
     
     rdf_service = request.app.state.rdf_service
     artist_uri = f"http://arp-greatteam.org/heritage-provenance/artist/{artist_id}"
+
+    try:
+        artist = rdf_service.get_artist(artist_uri)
+        
+        if artist is None:
+            return {
+                "error": "Artist not found",
+                "artist_id": artist_id
+            }
+        
+        return artist
+        
+    except Exception as e:
+        logger.error(f"Error retrieving artist {artist_id}: {e}")
+        return {
+            "error": "Failed to retrieve artist",
+            "artist_id": artist_id
+        }
 
 
 @router.get("/{artist_id}/enrich")

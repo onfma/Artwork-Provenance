@@ -157,7 +157,6 @@ class DataImporter:
         entity_id = str(uuid4())
         entity_uri = f"{base_uri}attributes/{entity_id}"
         
-        logger.debug(f"Creating new entity of type {entity_type} with name {names[0]} and link {link}")
         if self.rdf_service.add_entity(entity_type, entity_uri, names[0], link):
             self.created_entities[entity_key] = entity_uri
             logger.info(f"Created new entity: {entity_key}")
@@ -210,13 +209,17 @@ class DataImporter:
         material_aat = get_attr_text(cho_element, 'medium', 'dcterms')
         material_uri = self._find_or_create_entity('material', material_names, material_aat)
 
+        image_url = None
+        provider_wikidata_link = None
+        institute_name = None
+        
+        if agg is not None:
+            provider_wikidata_link = get_attr_text(agg, 'provider', 'edm')
+            institute_name = get_text(agg, 'dataProvider', 'edm')
+            image_url = get_attr_text(agg, 'isShownBy', 'edm')
 
-
-        provider_wikidata_link = get_text(agg, 'provider', 'edm')
-        provider_uri = self._find_or_create_entity('provider', [], provider_wikidata_link)
-
-        institute_name = get_text(agg, 'dataProvider', 'edm')
-        institute_uri = self._find_or_create_entity('institute', [institute_name] if institute_name else [], None)
+        provider_uri = self._find_or_create_entity('provider', [], provider_wikidata_link) if provider_wikidata_link else None
+        institute_uri = self._find_or_create_entity('institute', [institute_name] if institute_name else [], None) if institute_name else None
 
 
 
@@ -228,7 +231,7 @@ class DataImporter:
             'description': get_all_text(cho_element, 'description', 'dc'),
             'creationDate': get_text(cho_element, 'created', 'dcterms'),
             'dimensions': get_all_text(cho_element, 'extent', 'dcterms'),
-            'imageURL': get_attr_text(cho_element, 'isShownBy', 'edm'),
+            'imageURL': image_url,
             'type_uri': type_uri,
             'subject_uri': subject_uri,
             'material_uri': material_uri,

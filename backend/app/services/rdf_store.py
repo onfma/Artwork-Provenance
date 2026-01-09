@@ -2,14 +2,14 @@
 RDF Store Service - Manages RDF data and SPARQL queries
 """
 
+import structlog
+from typing import Dict, Any
+from urllib.parse import quote
+from app.config import settings
+from SPARQLWrapper import SPARQLWrapper
 from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, RDFS, OWL, XSD, DCTERMS, FOAF
-from SPARQLWrapper import SPARQLWrapper
-from typing import Dict, Any
-import structlog
-from urllib.parse import quote
 
-from app.config import settings
 
 logger = structlog.get_logger()
 
@@ -107,6 +107,10 @@ class RDFStoreService:
             raise
 
 
+    ##########################
+    # Adding entities as RDFs
+    ##########################
+
     def add_artwork(self, artwork_uri: str, artwork_data: Dict[str, Any]) -> bool:
         """Add artwork to RDF store"""
 
@@ -144,11 +148,16 @@ class RDFStoreService:
             add_artwork_id(artwork_data.get('inventoryNumber'))
             add_artwork_title(artwork_data.get('title'))
 
-            self.graph.add((artwork_ref, crm.P2_has_type, URIRef(artwork_data.get('type_uri')[1])))
-            self.graph.add((artwork_ref, crm.P15_was_influenced_by, URIRef(artwork_data.get('subject_uri')[1])))
-            self.graph.add((artwork_ref, crm.P45_consists_of, URIRef(artwork_data.get('material_uri')[1])))
-            self.graph.add((artwork_ref, crm.P70_documents, URIRef(artwork_data.get('provider_uri')[1])))
-            self.graph.add((artwork_ref, crm.P50i_is_currently_held_by, URIRef(artwork_data.get('institute_uri')[1])))
+            if artwork_data.get('type_uri'):
+                self.graph.add((artwork_ref, crm.P2_has_type, URIRef(artwork_data.get('type_uri'))))
+            if artwork_data.get('subject_uri'):
+                self.graph.add((artwork_ref, crm.P15_was_influenced_by, URIRef(artwork_data.get('subject_uri'))))
+            if artwork_data.get('material_uri'):
+                self.graph.add((artwork_ref, crm.P45_consists_of, URIRef(artwork_data.get('material_uri'))))
+            if artwork_data.get('provider_uri'):
+                self.graph.add((artwork_ref, crm.P70_documents, URIRef(artwork_data.get('provider_uri'))))
+            if artwork_data.get('institute_uri'):
+                self.graph.add((artwork_ref, crm.P50i_is_currently_held_by, URIRef(artwork_data.get('institute_uri'))))
             logger.info(f"Added artwork to RDF store: {artwork_uri}")
             return True
             
@@ -165,7 +174,7 @@ class RDFStoreService:
             
             if entity_type == 'provider':
                 self.graph.add((entity_ref, RDF.type, prov.Agent))
-                self.graph.add((entity_ref, OWL.sameAs, URIRef(f"http://www.wikidata.org/entity/{entity_link}")))
+                self.graph.add((entity_ref, OWL.sameAs, URIRef(f"{entity_link}")))
             elif entity_type == 'institute':
                 self.graph.add((entity_ref, RDF.type, prov.Agent))
             else:
@@ -193,13 +202,12 @@ class RDFStoreService:
             crm = self.ns['crm']
             artist_ref = URIRef(artist_uri)
             
-            # Add type
             self.graph.add((artist_ref, RDF.type, prov.Agent))
             self.graph.add((artist_ref, RDF.type, crm.E21_Person))
             self.graph.add((artist_ref, FOAF.name, Literal(artist_data['creator'])))
             
             if 'creatorULAN' in artist_data and artist_data['creatorULAN']:
-                self.graph.add((artist_ref, OWL.sameAs, URIRef(f"http://vocab.getty.edu/ulan/{artist_data['creatorULAN']}")))
+                self.graph.add((artist_ref, OWL.sameAs, URIRef(f"{artist_data['creatorULAN']}")))
 
             logger.info(f"Added artist to RDF store: {artist_uri}")
             return True
@@ -224,7 +232,7 @@ class RDFStoreService:
                     self.graph.add((location_ref, RDFS.label, Literal(loc_name)))
             
             if 'locationTGN' in location_data and location_data['locationTGN']:
-                self.graph.add((location_ref, OWL.sameAs, URIRef(f"http://vocab.getty.edu/tgn/{location_data['locationTGN']}")))
+                self.graph.add((location_ref, OWL.sameAs, URIRef(f"{location_data['locationTGN']}")))
 
             logger.info(f"Added location to RDF store: {location_uri}")
             return True
@@ -254,3 +262,300 @@ class RDFStoreService:
         except Exception as e:
             logger.error(f"Error adding provenance event to RDF store: {e}")
             return False
+
+    ##########################
+    # Querying RDFs
+    ##########################
+
+    def get_all_artworks(self) -> list:
+        """Query all artworks from RDF store"""
+        query = """
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        
+        SELECT ?artwork ?identifier ?title
+        WHERE {
+            ?artwork a prov:Entity ;
+                     a crm:E22_Man_Made_Object .
+            
+            OPTIONAL {
+                ?artwork crm:P1_is_identified_by ?id .
+                ?id crm:P190_has_symbolic_content ?identifier .
+            }
+            
+            OPTIONAL {
+                ?artwork crm:P102_has_title ?titleNode .
+                ?titleNode crm:P190_has_symbolic_content ?title .
+            }
+        }
+        ORDER BY ?identifier
+        """
+        
+        try:
+            results = self.graph.query(query)
+            artworks = []
+            
+            for row in results:
+                artwork_uri = str(row.artwork)
+                artwork_id = artwork_uri.split('/')[-1]
+                
+                artwork_data = {
+                    'id': artwork_id,
+                    'uri': artwork_uri,
+                    'inventoryNumber': str(row.identifier) if row.identifier else None,
+                    'title': str(row.title) if row.title else None
+                }
+                artworks.append(artwork_data)
+            
+            logger.info(f"Retrieved {len(artworks)} artworks from RDF store")
+            return artworks
+            
+        except Exception as e:
+            logger.error(f"Error querying artworks: {e}")
+            return []
+
+    def get_artwork(self, artwork_uri: str) -> Dict[str, Any]:
+        """Query specific artwork details from RDF store"""
+        query = f"""
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        
+        SELECT ?identifier ?title ?type ?typeLabel ?subject ?subjectLabel
+               ?material ?materialLabel ?provider ?institute
+               ?artist ?artistName ?location ?locationName ?event
+        WHERE {{
+            <{artwork_uri}> a prov:Entity ;
+                          a crm:E22_Man_Made_Object .
+            
+            OPTIONAL {{
+                <{artwork_uri}> crm:P1_is_identified_by ?id .
+                ?id crm:P190_has_symbolic_content ?identifier .
+            }}
+            
+            OPTIONAL {{
+                <{artwork_uri}> crm:P102_has_title ?titleNode .
+                ?titleNode crm:P190_has_symbolic_content ?title .
+            }}
+            
+            OPTIONAL {{
+                <{artwork_uri}> crm:P2_has_type ?type .
+                ?type rdfs:label ?typeLabel .
+            }}
+            
+            OPTIONAL {{
+                <{artwork_uri}> crm:P15_was_influenced_by ?subject .
+                ?subject rdfs:label ?subjectLabel .
+            }}
+            
+            OPTIONAL {{
+                <{artwork_uri}> crm:P45_consists_of ?material .
+                ?material rdfs:label ?materialLabel .
+            }}
+            
+            OPTIONAL {{
+                <{artwork_uri}> crm:P70_documents ?provider .
+            }}
+            
+            OPTIONAL {{
+                <{artwork_uri}> crm:P50i_is_currently_held_by ?institute .
+            }}
+            
+            OPTIONAL {{
+                ?event crm:P108_has_produced <{artwork_uri}> ;
+                       crm:P14_carried_out_by ?artist ;
+                       crm:P7_took_place_at ?location .
+                ?artist foaf:name ?artistName .
+                ?location rdfs:label ?locationName .
+            }}
+        }}
+        """
+        
+        try:
+            results = self.graph.query(query)
+            
+            if not results:
+                return None
+            
+            artwork_data = {
+                'id': artwork_uri.split('/')[-1],
+                'uri': artwork_uri,
+                'inventoryNumber': None,
+                'title': None,
+                'type': None,
+                'subject': None,
+                'material': None,
+                'provider': None,
+                'institute': None,
+                'artist': None,
+                'location': None,
+                'event': None
+            }
+            
+            for row in results:
+                if row.identifier:
+                    artwork_data['inventoryNumber'] = str(row.identifier)
+                if row.title:
+                    artwork_data['title'] = str(row.title)
+                if row.typeLabel:
+                    artwork_data['type'] = {
+                        'uri': str(row.type) if row.type else None,
+                        'label': str(row.typeLabel)
+                    }
+                if row.subjectLabel:
+                    artwork_data['subject'] = {
+                        'uri': str(row.subject) if row.subject else None,
+                        'label': str(row.subjectLabel)
+                    }
+                if row.materialLabel:
+                    artwork_data['material'] = {
+                        'uri': str(row.material) if row.material else None,
+                        'label': str(row.materialLabel)
+                    }
+                if row.provider:
+                    artwork_data['provider'] = str(row.provider)
+                if row.institute:
+                    artwork_data['institute'] = str(row.institute)
+                if row.artistName:
+                    artwork_data['artist'] = {
+                        'uri': str(row.artist) if row.artist else None,
+                        'name': str(row.artistName)
+                    }
+                if row.locationName:
+                    artwork_data['location'] = {
+                        'uri': str(row.location) if row.location else None,
+                        'name': str(row.locationName)
+                    }
+                if row.event:
+                    artwork_data['event'] = str(row.event)
+            
+            logger.info(f"Retrieved artwork details for: {artwork_uri}")
+            return artwork_data
+            
+        except Exception as e:
+            logger.error(f"Error querying artwork details: {e}")
+            return None
+
+
+    def get_all_artists(self) -> list:
+        """Query all artists from RDF store"""
+        query = """
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        
+        SELECT ?artist ?name ?ulan
+        WHERE {
+            ?artist a prov:Agent ;
+                    a crm:E21_Person ;
+                    foaf:name ?name .
+            OPTIONAL { ?artist owl:sameAs ?ulan . FILTER(CONTAINS(STR(?ulan), "ulan")) }
+        }
+        ORDER BY ?name
+        """
+        
+        try:
+            results = self.graph.query(query)
+            artists = []
+            
+            for row in results:
+                artist_uri = str(row.artist)
+                artist_id = artist_uri.split('/')[-1]
+                
+                artist_data = {
+                    'id': artist_id,
+                    'uri': artist_uri,
+                    'name': str(row.name),
+                    'getty': str(row.ulan) if row.ulan else None
+                }
+                artists.append(artist_data)
+            
+            logger.info(f"Retrieved {len(artists)} artists from RDF store")
+            return artists
+            
+        except Exception as e:
+            logger.error(f"Error querying artists: {e}")
+            return []
+        
+    def get_artist(self, artist_uri: str) -> Dict[str, Any]:
+        """Query specific artist details from RDF store including all associated artworks"""
+        query = f"""
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        
+        SELECT ?name ?ulan ?artwork ?artworkTitle ?artworkIdentifier
+        WHERE {{
+            <{artist_uri}> a prov:Agent ;
+                          a crm:E21_Person ;
+                          foaf:name ?name .
+            
+            OPTIONAL {{
+                <{artist_uri}> owl:sameAs ?ulan .
+                FILTER(CONTAINS(STR(?ulan), "ulan"))
+            }}
+            
+            OPTIONAL {{
+                ?event crm:P14_carried_out_by <{artist_uri}> ;
+                       crm:P108_has_produced ?artwork .
+                
+                OPTIONAL {{
+                    ?artwork crm:P102_has_title ?titleNode .
+                    ?titleNode crm:P190_has_symbolic_content ?artworkTitle .
+                }}
+                
+                OPTIONAL {{
+                    ?artwork crm:P1_is_identified_by ?id .
+                    ?id crm:P190_has_symbolic_content ?artworkIdentifier .
+                }}
+            }}
+        }}
+        """
+        
+        try:
+            results = self.graph.query(query)
+            
+            if not results:
+                return None
+            
+            artist_data = {
+                'id': artist_uri.split('/')[-1],
+                'uri': artist_uri,
+                'name': None,
+                'getty': None,
+                'artworks': []
+            }
+            
+            artworks_dict = {}
+            
+            for row in results:
+                if row.name and not artist_data['name']:
+                    artist_data['name'] = str(row.name)
+                if row.ulan and not artist_data['getty']:
+                    artist_data['getty'] = str(row.ulan)
+                
+                if row.artwork:
+                    artwork_uri = str(row.artwork)
+                    artwork_id = artwork_uri.split('/')[-1]
+                    
+                    if artwork_id not in artworks_dict:
+                        artworks_dict[artwork_id] = {
+                            'id': artwork_id,
+                            'uri': artwork_uri,
+                            'title': str(row.artworkTitle) if row.artworkTitle else None,
+                            'inventoryNumber': str(row.artworkIdentifier) if row.artworkIdentifier else None
+                        }
+            
+            artist_data['artworks'] = list(artworks_dict.values())
+            
+            logger.info(f"Retrieved artist details for: {artist_uri} with {len(artist_data['artworks'])} artworks")
+            return artist_data
+            
+        except Exception as e:
+            logger.error(f"Error querying artist details: {e}")
+            return None
