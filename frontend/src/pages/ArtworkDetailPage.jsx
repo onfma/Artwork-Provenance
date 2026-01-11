@@ -7,7 +7,8 @@ import {
   UserIcon, 
   TagIcon,
   InformationCircleIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  LinkIcon
 } from '@heroicons/react/24/outline'
 
 const ArtworkDetailPage = () => {
@@ -47,7 +48,7 @@ const ArtworkDetailPage = () => {
   if (!artwork) return null
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" vocab="http://schema.org/" typeof="VisualArtwork" about={artwork.uri}>
       {/* Back Button */}
       <Link to="/artworks" className="text-gray-400 hover:text-white flex items-center space-x-2 group">
         <ArrowLeftIcon className="h-4 w-4 group-hover:-translate-x-1 transition" />
@@ -60,7 +61,7 @@ const ArtworkDetailPage = () => {
         <div className="space-y-4">
           <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
             {artwork.imageURL ? (
-              <img src={artwork.imageURL} alt={artwork.title} className="w-full h-auto object-cover" />
+              <img src={artwork.imageURL} alt={artwork.title} className="w-full h-auto object-cover" property="image" />
             ) : (
               <div className="h-96 bg-gray-700 flex items-center justify-center">
                 <span className="text-6xl">🎨</span>
@@ -72,35 +73,37 @@ const ArtworkDetailPage = () => {
         {/* Details Section */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-4xl font-bold text-white">{artwork.title}</h1>
+            <h1 className="text-4xl font-bold text-white" property="name">{artwork.title}</h1>
             {artwork.title_ro && (
-              <p className="text-xl text-gray-400 mt-2 italic">{artwork.title_ro}</p>
+              <p className="text-xl text-gray-400 mt-2 italic" property="alternateName" lang="ro">{artwork.title_ro}</p>
             )}
           </div>
 
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700 space-y-4">
-            <div className="flex items-center space-x-3 text-gray-300">
+            <div className="flex items-center space-x-3 text-gray-300" property="creator" typeof={artwork.artist?.type === 'Organization' ? 'Organization' : 'Person'}>
               <UserIcon className="h-5 w-5 text-indigo-400" />
               <span className="font-medium">Artist:</span>
-              <span>{artwork.artist?.name || 'Unknown'}</span>
+              <span property="name">{artwork.artist?.name || 'Unknown'}</span>
             </div>
             
             <div className="flex items-center space-x-3 text-gray-300">
               <CalendarIcon className="h-5 w-5 text-indigo-400" />
               <span className="font-medium">Date:</span>
-              <span>{artwork.creation_date || 'Unknown'}</span>
+              <span property="dateCreated">{artwork.creation_date || 'Unknown'}</span>
             </div>
 
             <div className="flex items-center space-x-3 text-gray-300">
               <TagIcon className="h-5 w-5 text-indigo-400" />
               <span className="font-medium">Type:</span>
-              <span>{artwork.artwork_type || 'Unknown'}</span>
+              <span property="artform">{artwork.type.label || 'Unknown'}</span>
             </div>
 
             <div className="flex items-center space-x-3 text-gray-300">
               <MapPinIcon className="h-5 w-5 text-indigo-400" />
               <span className="font-medium">Location:</span>
-              <span>{artwork.current_location?.name || 'Unknown'}</span>
+              <span property="location" typeof="Place">
+                <span property="name">{artwork.current_location?.name || 'Unknown'}</span>
+              </span>
             </div>
 
             {artwork.medium && (
@@ -108,7 +111,41 @@ const ArtworkDetailPage = () => {
                 <InformationCircleIcon className="h-5 w-5 text-indigo-400 mt-1" />
                 <div>
                   <span className="font-medium">Medium:</span>
-                  <p className="mt-1 text-gray-400">{artwork.medium}</p>
+                  <p className="mt-1 text-gray-400" property="artMedium">{artwork.medium}</p>
+                </div>
+              </div>
+            )}
+
+            {artwork.dimensions && (
+              <div className="flex items-center space-x-3 text-gray-300">
+                <TagIcon className="h-5 w-5 text-indigo-400" />
+                <span className="font-medium">Dimensions:</span>
+                <span property="size">
+                  {[artwork.dimensions.height, artwork.dimensions.width, artwork.dimensions.depth]
+                    .filter(Boolean).join(' x ')} cm
+                </span>
+              </div>
+            )}
+
+            {artwork.external_links && artwork.external_links.length > 0 && (
+              <div className="flex items-start space-x-3 text-gray-300">
+                <LinkIcon className="h-5 w-5 text-indigo-400 mt-1" />
+                <div>
+                  <span className="font-medium">External Links:</span>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {artwork.external_links.map((link, idx) => (
+                      <a 
+                        key={idx} 
+                        href={link.uri} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-indigo-400 hover:text-indigo-300 text-sm underline"
+                        property="sameAs"
+                      >
+                        {link.source}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -116,25 +153,33 @@ const ArtworkDetailPage = () => {
             {artwork.description && (
               <div className="pt-4 border-t border-gray-700">
                 <h3 className="text-lg font-semibold text-white mb-2">Description</h3>
-                <p className="text-gray-400 leading-relaxed">{artwork.description}</p>
+                <p className="text-gray-400 leading-relaxed" property="description">{artwork.description}</p>
               </div>
             )}
           </div>
           
           {/* Provenance Link */}
-           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-            <h3 className="text-lg font-semibold text-white mb-2">Provenance</h3>
-            <p className="text-gray-400 mb-4">
-              {artwork.provenance_chain 
-                ? `${artwork.provenance_chain.length} recorded events in history.` 
-                : 'No provenance data available.'}
-            </p>
-            <Link 
-              to={`/provenance/${id}`}
-              className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-            >
-              View Full Provenance Chain
-            </Link>
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700" vocab="http://www.w3.org/ns/prov#">
+            <h3 className="text-lg font-semibold text-white mb-4">Provenance History</h3>
+            {artwork.provenance_chain && artwork.provenance_chain.length > 0 ? (
+              <div className="space-y-4">
+                {artwork.provenance_chain.map((event, index) => (
+                  <div key={index} typeof="Activity" className="border-l-2 border-indigo-500 pl-4 py-1">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-white" property="type">{event.event_type}</span>
+                      <span className="text-sm text-gray-400" property="startedAtTime">{event.date}</span>
+                      {event.location && (
+                        <span className="text-sm text-gray-300" property="atLocation" typeof="Location">
+                          <span property="name">{event.location.name}</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-400">No provenance data available.</p>
+            )}
           </div>
         </div>
       </div>

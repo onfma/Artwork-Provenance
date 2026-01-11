@@ -10,8 +10,21 @@ from SPARQLWrapper import SPARQLWrapper
 from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, RDFS, OWL, XSD, DCTERMS, FOAF
 
+from app.models import ArtworkType
+
 
 logger = structlog.get_logger()
+
+TYPE_KEYWORDS = {
+    "drawing": ["desen", "drawing", "schiță", "schita", "sketch", "creion", "pencil", "cărbune", "charcoal", "tuș", "ink", "pastel", "grafică", "graphic"],
+    "print": ["gravură", "gravura", "print", "litografie", "lithograph", "acvaforte", "etching", "xilogravură", "woodcut", "stampă", "serigrafie"],
+    "photograph": ["fotografie", "fotografia", "photograph", "photo", "foto", "negativ", "negative", "daguerreotype"],
+    "manuscript": ["manuscris", "manuscript", "document", "scrisoare", "letter", "incunabul", "carte"],
+    "installation": ["instalație", "instalatie", "installation"],
+    "artifact": ["artefact", "artifact", "ceramică", "ceramic", "pottery", "porțelan", "textil", "textile", "covor", "carpet", "tapiserie", "monedă", "coin", "bijuterie", "jewelry", "mobilier", "furniture", "vas", "vessel"],
+    "sculpture": ["sculptură", "sculptura", "sculpture", "statuie", "statue", "bust", "relief", "bronz", "bronze", "marmură", "marble", "ronde-bosse"],
+    "painting": ["pictură", "pictura", "painting", "ulei", "oil", "pânză", "panza", "canvas"]
+}
 
 
 class RDFStoreService:
@@ -266,14 +279,21 @@ class RDFStoreService:
     # Querying RDFs [SPARQL]
     ##########################
 
-    def get_all_artworks(self, filters: Dict[str, str] = None, limit: int = 20) -> list:
+    def get_all_artworks(self, filters: Dict[str, str] = None, search: str = None, limit: int = 20, skip: int = 0) -> list:
         """Query all artworks from RDF store with optional filters"""
         
         filter_clauses = ""
+        search_filter = ""
         
         if filters:
-            if filters.get('type_uri'):
-                filter_clauses += f"\n            ?artwork crm:P2_has_type <{filters['type_uri']}> ."
+            if filters.get('type'):
+                type_key = filters['type'].lower()
+                keywords = TYPE_KEYWORDS.get(type_key, [type_key])
+                keyword_conditions = " || ".join([f'CONTAINS(LCASE(?typeLabel), "{k}")' for k in keywords])
+                filter_clauses += f"""
+            ?artwork crm:P2_has_type ?type .
+            ?type rdfs:label ?typeLabel .
+            FILTER({keyword_conditions})"""
             if filters.get('material_uri'):
                 filter_clauses += f"\n            ?artwork crm:P45_consists_of <{filters['material_uri']}> ."
             if filters.get('subject_uri'):
@@ -286,6 +306,10 @@ class RDFStoreService:
                 filter_clauses += f"""
             ?event crm:P108_has_produced ?artwork ;
                    crm:P7_took_place_at <{filters['location_uri']}> ."""
+
+        if search:
+            safe_search = search.replace('"', '\\"')
+            search_filter = f'FILTER(CONTAINS(LCASE(?title), LCASE("{safe_search}")))'
         
         query = f"""
         PREFIX prov: <http://www.w3.org/ns/prov#>
@@ -310,9 +334,12 @@ class RDFStoreService:
             OPTIONAL {{
                 ?artwork foaf:depiction ?imageURL .
             }}
+
+            {search_filter}
         }}
         ORDER BY ?identifier
         LIMIT {limit}
+        OFFSET {skip}
         """
         
         try:
@@ -431,7 +458,7 @@ class RDFStoreService:
                 if row.typeLabel:
                     artwork_data['type'] = {
                         'uri': str(row.type) if row.type else None,
-                        'label': str(row.typeLabel),
+                        'label': str(ArtworkType.from_text(row.typeLabel)),
                         'link': str(row.typeLink) if row.typeLink else None
                     }
                 if row.subjectLabel:
@@ -1001,6 +1028,3 @@ class RDFStoreService:
         except Exception as e:
             logger.error(f"Error executing SPARQL query: {e}")
             return None
-
-
-

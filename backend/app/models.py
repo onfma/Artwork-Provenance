@@ -33,6 +33,9 @@ class ArtworkType(str, Enum):
     ARTIFACT = "artifact"
     INSTALLATION = "installation"
 
+    def __str__(self):
+        return str(self.value.capitalize())
+
     @classmethod
     def from_text(cls, text: str) -> "ArtworkType":
         """
@@ -41,7 +44,7 @@ class ArtworkType(str, Enum):
         """
 
         if not text:
-            return cls.PAINTING
+            return cls.ARTIFACT
         
         if isinstance(text, dict):
             if 'label' in text.keys():
@@ -93,7 +96,7 @@ class ArtworkType(str, Enum):
         # Painting (Default for "ulei", "canvas", etc, and explicit "pictura")
         # Note: "Painting" is also the default fallback if nothing matches
         
-        return cls.PAINTING
+        return cls.ARTIFACT
 
 
 class ExternalLink(BaseModel):

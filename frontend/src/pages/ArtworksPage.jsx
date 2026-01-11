@@ -11,14 +11,26 @@ const ArtworksPage = () => {
     subject_id: '',
     artist_id: '',
     location_id: '',
-    limit: 20
+    limit: 20,
+    skip: 0
   })
 
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+      setFilters(prev => ({ ...prev, skip: 0 }))
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  const queryParams = { ...filters, search: debouncedSearchTerm }
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['artworks', filters],
-    queryFn: () => getArtworks(filters).then(res => res.data.artworks)
+    queryKey: ['artworks', queryParams],
+    queryFn: () => getArtworks(queryParams).then(res => res.data.artworks)
   })
 
   const artworkTypes = [
@@ -26,11 +38,19 @@ const ArtworksPage = () => {
     { value: 'painting', label: 'Painting' },
     { value: 'sculpture', label: 'Sculpture' },
     { value: 'drawing', label: 'Drawing' },
+    { value: 'print', label: 'Print' },
     { value: 'photograph', label: 'Photograph' },
+    { value: 'manuscript', label: 'Manuscript' },
+    { value: 'artifact', label: 'Artifact' },
+    { value: 'installation', label: 'Installation' }
   ]
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value, skip: 0 }))
+    setFilters(prev => ({ 
+      ...prev, 
+      [key]: value, 
+      skip: key === 'skip' ? value : 0 
+    }))
   }
 
   return (
@@ -42,7 +62,7 @@ const ArtworksPage = () => {
 
       {/* Filters */}
       <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Search */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -66,8 +86,8 @@ const ArtworksPage = () => {
               Artwork Type
             </label>
             <select
-              value={filters.artwork_type}
-              onChange={(e) => handleFilterChange('artwork_type', e.target.value)}
+              value={filters.type_id}
+              onChange={(e) => handleFilterChange('type_id', e.target.value)}
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               {artworkTypes.map(type => (
@@ -79,7 +99,7 @@ const ArtworksPage = () => {
           </div>
 
           {/* Romanian Heritage Filter */}
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Romanian Heritage
             </label>
@@ -95,7 +115,7 @@ const ArtworksPage = () => {
               <option value="true">Romanian Heritage Only</option>
               <option value="false">Non-Romanian Heritage</option>
             </select>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -117,10 +137,13 @@ const ArtworksPage = () => {
                 key={artwork.uri}
                 to={`/artworks/${artwork.uri.split('/').pop()}`}
                 className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700 hover:border-indigo-500 transition group"
+                vocab="http://schema.org/"
+                typeof="VisualArtwork"
+                about={artwork.uri}
               >
                 {/* Image placeholder */}
                 {artwork.imageURL ? (
-                  <img src={artwork.imageURL} alt={artwork.title} className="w-full h-48 object-cover" />
+                  <img src={artwork.imageURL} alt={artwork.title} className="w-full h-48 object-cover" property="image" />
                 ) : (
                   <div className="h-48 bg-gray-700 flex items-center justify-center">
                     <span className="text-6xl">🎨</span>
@@ -131,22 +154,22 @@ const ArtworksPage = () => {
 
                 {/* Content */}
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold text-white group-hover:text-indigo-400 transition">
+                  <h3 className="text-lg font-semibold text-white group-hover:text-indigo-400 transition" property="name">
                     {artwork.title}
                   </h3>
                   {artwork.title_ro && (
-                    <p className="text-sm text-gray-400 mt-1">{artwork.title_ro}</p>
+                    <p className="text-sm text-gray-400 mt-1" property="alternateName" lang="ro">{artwork.title_ro}</p>
                   )}
                   
                   <div className="mt-3 space-y-2 text-sm text-gray-400">
                     {artwork.artist && (
-                      <p>Artist: {artwork.artist.name}</p>
+                      <p property="creator" typeof={artwork.artist.type === 'Organization' ? 'Organization' : 'Person'}>Artist: <span property="name">{artwork.artist.name}</span></p>
                     )}
                     {artwork.creation_date && (
-                      <p>Created: {artwork.creation_date}</p>
+                      <p>Created: <span property="dateCreated">{artwork.creation_date}</span></p>
                     )}
                     {artwork.artwork_type && (
-                      <span className="inline-block px-2 py-1 bg-gray-700 rounded text-xs">
+                      <span className="inline-block px-2 py-1 bg-gray-700 rounded text-xs" property="artform">
                         {artwork.artwork_type}
                       </span>
                     )}

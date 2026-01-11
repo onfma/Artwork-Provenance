@@ -21,7 +21,9 @@ async def list_artworks(
     subject_id: str = Query(None, description="Filter by subject ID"),
     artist_id: str = Query(None, description="Filter by artist ID"),
     location_id: str = Query(None, description="Filter by location ID"),
-    limit: int = Query(20, ge=1, le=100, description="Maximum number of results")
+    search: str = Query(None, description="Search term"),
+    limit: int = Query(20, ge=1, le=100, description="Maximum number of results"),
+    skip: int = Query(0, ge=0, description="Number of results to skip")
 ):
     """List all artworks with optional filters"""
     
@@ -30,7 +32,7 @@ async def list_artworks(
     try:
         filters = {}
         if type_id and type_id != '':
-            filters['type_uri'] = f"http://arp-greatteam.org/heritage-provenance/attributes/{type_id}"
+            filters['type'] = type_id
         if material_id and material_id != '':
             filters['material_uri'] = f"http://arp-greatteam.org/heritage-provenance/attributes/{material_id}"
         if subject_id and subject_id != '':
@@ -40,7 +42,7 @@ async def list_artworks(
         if location_id and location_id != '':
             filters['location_uri'] = f"http://arp-greatteam.org/heritage-provenance/location/{location_id}"
         
-        artworks = rdf_service.get_all_artworks(filters=filters, limit=limit)
+        artworks = rdf_service.get_all_artworks(filters=filters, search=search, limit=limit, skip=skip)
         return {
             "count": len(artworks),
             "artworks": artworks
