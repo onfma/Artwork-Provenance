@@ -1,0 +1,1802 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Heritage Provenance System",
+        "description": "API for modeling and managing artwork provenance with integration to DBpedia, Wikidata, Getty vocabularies, and Romanian heritage",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/artworks/": {
+            "get": {
+                "tags": [
+                    "Artworks"
+                ],
+                "summary": "List Artworks",
+                "description": "List all artworks with optional filters",
+                "operationId": "list_artworks_api_artworks__get",
+                "parameters": [
+                    {
+                        "name": "type_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "description": "Filter by type ID",
+                            "title": "Type Id"
+                        },
+                        "description": "Filter by type ID"
+                    },
+                    {
+                        "name": "material_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "description": "Filter by material ID",
+                            "title": "Material Id"
+                        },
+                        "description": "Filter by material ID"
+                    },
+                    {
+                        "name": "subject_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "description": "Filter by subject ID",
+                            "title": "Subject Id"
+                        },
+                        "description": "Filter by subject ID"
+                    },
+                    {
+                        "name": "artist_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "description": "Filter by artist ID",
+                            "title": "Artist Id"
+                        },
+                        "description": "Filter by artist ID"
+                    },
+                    {
+                        "name": "location_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "description": "Filter by location ID",
+                            "title": "Location Id"
+                        },
+                        "description": "Filter by location ID"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1,
+                            "description": "Maximum number of results",
+                            "default": 20,
+                            "title": "Limit"
+                        },
+                        "description": "Maximum number of results"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/artworks/{artwork_id}": {
+            "get": {
+                "tags": [
+                    "Artworks"
+                ],
+                "summary": "Get Artwork",
+                "description": "Get a specific artwork by ID with complete details",
+                "operationId": "get_artwork_api_artworks__artwork_id__get",
+                "parameters": [
+                    {
+                        "name": "artwork_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Artwork Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/artists/": {
+            "get": {
+                "tags": [
+                    "Artists"
+                ],
+                "summary": "List Artists",
+                "description": "List all artists with optional filters",
+                "operationId": "list_artists_api_artists__get",
+                "parameters": [
+                    {
+                        "name": "location_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "description": "Filter by location ID where they created artworks",
+                            "title": "Location Id"
+                        },
+                        "description": "Filter by location ID where they created artworks"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1,
+                            "description": "Maximum number of results",
+                            "default": 20,
+                            "title": "Limit"
+                        },
+                        "description": "Maximum number of results"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/artists/{artist_id}": {
+            "get": {
+                "tags": [
+                    "Artists"
+                ],
+                "summary": "Get Artist",
+                "description": "Get a specific artist by ID with complete details",
+                "operationId": "get_artist_api_artists__artist_id__get",
+                "parameters": [
+                    {
+                        "name": "artist_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Artist Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/artists/getty/{artist_getty_id}": {
+            "get": {
+                "tags": [
+                    "Artists"
+                ],
+                "summary": "Get Artist",
+                "description": "Get a specific artist by GETTY ID with complete details",
+                "operationId": "get_artist_api_artists_getty__artist_getty_id__get",
+                "parameters": [
+                    {
+                        "name": "artist_getty_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Artist Getty Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/provenance/": {
+            "get": {
+                "tags": [
+                    "Provenance"
+                ],
+                "summary": "List Events",
+                "description": "List all events with optional filters",
+                "operationId": "list_events_api_provenance__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/provenance/{event_id}": {
+            "get": {
+                "tags": [
+                    "Provenance"
+                ],
+                "summary": "Get Event",
+                "description": "Get a specific provenance event by ID with complete details",
+                "operationId": "get_event_api_provenance__event_id__get",
+                "parameters": [
+                    {
+                        "name": "event_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Event Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/provenance/{artwork_id}/chain": {
+            "get": {
+                "tags": [
+                    "Provenance"
+                ],
+                "summary": "Get Provenance Chain",
+                "description": "Get complete provenance chain for an artwork (all events associated with it)",
+                "operationId": "get_provenance_chain_api_provenance__artwork_id__chain_get",
+                "parameters": [
+                    {
+                        "name": "artwork_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Artwork Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/locations/": {
+            "get": {
+                "tags": [
+                    "Locations"
+                ],
+                "summary": "List Locations",
+                "description": "List all locations with optional filters",
+                "operationId": "list_locations_api_locations__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/locations/{location_id}": {
+            "get": {
+                "tags": [
+                    "Locations"
+                ],
+                "summary": "Get Location",
+                "description": "Get a specific location by ID with complete details",
+                "operationId": "get_location_api_locations__location_id__get",
+                "parameters": [
+                    {
+                        "name": "location_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Location Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sparql/query": {
+            "post": {
+                "tags": [
+                    "SPARQL"
+                ],
+                "summary": "Sparql Query",
+                "description": "Execute SPARQL query against the RDF store",
+                "operationId": "sparql_query_api_sparql_query_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SPARQLQuery"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SPARQLResult"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "SPARQL"
+                ],
+                "summary": "Sparql Query Get",
+                "description": "Execute SPARQL query via GET (standard SPARQL protocol)",
+                "operationId": "sparql_query_get_api_sparql_query_get",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "SPARQL query string",
+                            "title": "Query"
+                        },
+                        "description": "SPARQL query string"
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^(json|xml|csv|tsv)$",
+                            "default": "json",
+                            "title": "Format"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sparql/statistics": {
+            "get": {
+                "tags": [
+                    "SPARQL"
+                ],
+                "summary": "Get Statistics",
+                "description": "Get statistical information via SPARQL",
+                "operationId": "get_statistics_api_sparql_statistics_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sparql/federated/dbpedia": {
+            "get": {
+                "tags": [
+                    "SPARQL"
+                ],
+                "summary": "Query Dbpedia",
+                "description": "Execute federated query against DBpedia",
+                "operationId": "query_dbpedia_api_sparql_federated_dbpedia_get",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "SPARQL query for DBpedia",
+                            "title": "Query"
+                        },
+                        "description": "SPARQL query for DBpedia"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sparql/federated/wikidata": {
+            "get": {
+                "tags": [
+                    "SPARQL"
+                ],
+                "summary": "Query Wikidata",
+                "description": "Execute federated query against Wikidata",
+                "operationId": "query_wikidata_api_sparql_federated_wikidata_get",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "SPARQL query for Wikidata",
+                            "title": "Query"
+                        },
+                        "description": "SPARQL query for Wikidata"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sparql/federated/getty": {
+            "get": {
+                "tags": [
+                    "SPARQL"
+                ],
+                "summary": "Query Getty",
+                "description": "Execute federated query against Getty vocabularies",
+                "operationId": "query_getty_api_sparql_federated_getty_get",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "SPARQL query for Getty vocabularies",
+                            "title": "Query"
+                        },
+                        "description": "SPARQL query for Getty vocabularies"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recommendations/": {
+            "post": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Get Recommendations",
+                "description": "Get artwork recommendations based on a target artwork",
+                "operationId": "get_recommendations_api_recommendations__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RecommendationRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Recommendation"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Get Recommendations Api Recommendations  Post"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recommendations/{artwork_id}": {
+            "get": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Get Recommendations For Artwork",
+                "description": "Get recommendations for a specific artwork",
+                "operationId": "get_recommendations_for_artwork_api_recommendations__artwork_id__get",
+                "parameters": [
+                    {
+                        "name": "artwork_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Artwork Id"
+                        }
+                    },
+                    {
+                        "name": "max_results",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50,
+                            "minimum": 1,
+                            "default": 10,
+                            "title": "Max Results"
+                        }
+                    },
+                    {
+                        "name": "criteria",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "description": "Comma-separated criteria",
+                            "default": "artist,period,type,location",
+                            "title": "Criteria"
+                        },
+                        "description": "Comma-separated criteria"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Recommendation"
+                                    },
+                                    "title": "Response Get Recommendations For Artwork Api Recommendations  Artwork Id  Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recommendations/{artist_id}": {
+            "get": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Get Recommendations For Artist",
+                "description": "Get recommendations for a specific artist",
+                "operationId": "get_recommendations_for_artist_api_recommendations__artist_id__get",
+                "parameters": [
+                    {
+                        "name": "artist_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Artist Id"
+                        }
+                    },
+                    {
+                        "name": "max_results",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50,
+                            "minimum": 1,
+                            "default": 10,
+                            "title": "Max Results"
+                        }
+                    },
+                    {
+                        "name": "criteria",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "description": "Comma-separated criteria",
+                            "default": "artist,period,location",
+                            "title": "Criteria"
+                        },
+                        "description": "Comma-separated criteria"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Recommendation"
+                                    },
+                                    "title": "Response Get Recommendations For Artist Api Recommendations  Artist Id  Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/visualization/statistics/overview": {
+            "get": {
+                "tags": [
+                    "Visualization"
+                ],
+                "summary": "Get Overview Statistics",
+                "description": "Get overview statistics for dashboard",
+                "operationId": "get_overview_statistics_api_visualization_statistics_overview_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": true,
+                                    "type": "object",
+                                    "title": "Response Get Overview Statistics Api Visualization Statistics Overview Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/visualization/statistics/by-type": {
+            "get": {
+                "tags": [
+                    "Visualization"
+                ],
+                "summary": "Get Artworks By Type",
+                "description": "Get distribution of artworks by type",
+                "operationId": "get_artworks_by_type_api_visualization_statistics_by_type_get",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50,
+                            "minimum": 1,
+                            "default": 10,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/visualization/statistics/by-material": {
+            "get": {
+                "tags": [
+                    "Visualization"
+                ],
+                "summary": "Get Artworks By Material",
+                "description": "Get distribution of artworks by material",
+                "operationId": "get_artworks_by_material_api_visualization_statistics_by_material_get",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50,
+                            "minimum": 1,
+                            "default": 10,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/visualization/statistics/top-artists": {
+            "get": {
+                "tags": [
+                    "Visualization"
+                ],
+                "summary": "Get Top Artists",
+                "description": "Get top artists by number of artworks",
+                "operationId": "get_top_artists_api_visualization_statistics_top_artists_get",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50,
+                            "minimum": 1,
+                            "default": 10,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/visualization/statistics/top-locations": {
+            "get": {
+                "tags": [
+                    "Visualization"
+                ],
+                "summary": "Get Top Locations",
+                "description": "Get top locations by number of artworks",
+                "operationId": "get_top_locations_api_visualization_statistics_top_locations_get",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50,
+                            "minimum": 1,
+                            "default": 10,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/visualization/map/locations": {
+            "get": {
+                "tags": [
+                    "Visualization"
+                ],
+                "summary": "Get Location Map",
+                "description": "Get map visualization data for artwork locations",
+                "operationId": "get_location_map_api_visualization_map_locations_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/visualization/statistics/network/artists/{artist_id}": {
+            "get": {
+                "tags": [
+                    "Visualization"
+                ],
+                "summary": "Get Network Artists",
+                "description": "Get network of artists connected to a specific artist by student_of/teacher_of relationships",
+                "operationId": "get_network_artists_api_visualization_statistics_network_artists__artist_id__get",
+                "parameters": [
+                    {
+                        "name": "artist_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Artist Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/": {
+            "get": {
+                "summary": "Root",
+                "description": "Root endpoint with system information",
+                "operationId": "root__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Agent": {
+                "properties": {
+                    "uri": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Uri",
+                        "description": "URI of the agent"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": "Name of the agent"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Type",
+                        "description": "Type: Person or Organization"
+                    },
+                    "birth_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Birth Date",
+                        "description": "Birth date"
+                    },
+                    "death_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Death Date",
+                        "description": "Death date"
+                    },
+                    "nationality": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Nationality",
+                        "description": "Nationality"
+                    },
+                    "external_links": {
+                        "items": {
+                            "$ref": "#/components/schemas/ExternalLink"
+                        },
+                        "type": "array",
+                        "title": "External Links"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "type"
+                ],
+                "title": "Agent",
+                "description": "Person or organization"
+            },
+            "Artwork": {
+                "properties": {
+                    "uri": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Uri",
+                        "description": "URI of the artwork"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title",
+                        "description": "Title of the artwork"
+                    },
+                    "title_ro": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Title Ro",
+                        "description": "Romanian title"
+                    },
+                    "artist": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/Agent"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Creator of the artwork"
+                    },
+                    "creation_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Creation Date",
+                        "description": "Date created"
+                    },
+                    "artwork_type": {
+                        "$ref": "#/components/schemas/ArtworkType",
+                        "description": "Type of artwork"
+                    },
+                    "medium": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Medium",
+                        "description": "Medium/materials used"
+                    },
+                    "dimensions": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": {
+                                    "type": "number"
+                                },
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Dimensions",
+                        "description": "Dimensions (height, width, depth in cm)"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description",
+                        "description": "Description of the artwork"
+                    },
+                    "description_ro": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description Ro",
+                        "description": "Romanian description"
+                    },
+                    "current_location": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/Location"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Current location"
+                    },
+                    "current_owner": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/Agent"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Current owner"
+                    },
+                    "provenance_chain": {
+                        "items": {
+                            "$ref": "#/components/schemas/ProvenanceEvent"
+                        },
+                        "type": "array",
+                        "title": "Provenance Chain",
+                        "description": "Chronological provenance history"
+                    },
+                    "external_links": {
+                        "items": {
+                            "$ref": "#/components/schemas/ExternalLink"
+                        },
+                        "type": "array",
+                        "title": "External Links"
+                    },
+                    "romanian_heritage": {
+                        "type": "boolean",
+                        "title": "Romanian Heritage",
+                        "description": "Part of Romanian heritage",
+                        "default": false
+                    },
+                    "getty_classification": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Getty Classification",
+                        "description": "Getty AAT classification"
+                    },
+                    "images": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Images",
+                        "description": "Image URLs"
+                    },
+                    "created_at": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Updated At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "title",
+                    "artwork_type"
+                ],
+                "title": "Artwork",
+                "description": "Artistic work with provenance"
+            },
+            "ArtworkType": {
+                "type": "string",
+                "enum": [
+                    "painting",
+                    "sculpture",
+                    "drawing",
+                    "print",
+                    "photograph",
+                    "manuscript",
+                    "artifact",
+                    "installation"
+                ],
+                "title": "ArtworkType",
+                "description": "Types of artworks"
+            },
+            "ExternalLink": {
+                "properties": {
+                    "source": {
+                        "type": "string",
+                        "title": "Source",
+                        "description": "Source name (DBpedia, Wikidata, etc.)"
+                    },
+                    "uri": {
+                        "type": "string",
+                        "title": "Uri",
+                        "description": "URI of the external resource"
+                    },
+                    "label": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Label",
+                        "description": "Human-readable label"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "source",
+                    "uri"
+                ],
+                "title": "ExternalLink",
+                "description": "External resource link"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "Location": {
+                "properties": {
+                    "uri": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Uri",
+                        "description": "URI of the location"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": "Name of the location"
+                    },
+                    "address": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Address",
+                        "description": "Physical address"
+                    },
+                    "city": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "City",
+                        "description": "City"
+                    },
+                    "country": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Country",
+                        "description": "Country"
+                    },
+                    "coordinates": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": {
+                                    "type": "number"
+                                },
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Coordinates",
+                        "description": "Lat/Long coordinates"
+                    },
+                    "external_links": {
+                        "items": {
+                            "$ref": "#/components/schemas/ExternalLink"
+                        },
+                        "type": "array",
+                        "title": "External Links"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "title": "Location",
+                "description": "Physical location"
+            },
+            "ProvenanceEvent": {
+                "properties": {
+                    "uri": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Uri",
+                        "description": "URI of the event"
+                    },
+                    "event_type": {
+                        "$ref": "#/components/schemas/ProvenanceEventType",
+                        "description": "Type of provenance event"
+                    },
+                    "date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Date",
+                        "description": "Date of the event (ISO 8601)"
+                    },
+                    "location": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/Location"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Location where event occurred"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "event_type"
+                ],
+                "title": "ProvenanceEvent",
+                "description": "Provenance event in the artwork's history"
+            },
+            "ProvenanceEventType": {
+                "type": "string",
+                "enum": [
+                    "acquisition",
+                    "sale",
+                    "transfer",
+                    "exhibition",
+                    "loan",
+                    "restoration",
+                    "theft",
+                    "recovery",
+                    "donation",
+                    "inheritance"
+                ],
+                "title": "ProvenanceEventType",
+                "description": "Types of provenance events"
+            },
+            "Recommendation": {
+                "properties": {
+                    "artwork": {
+                        "$ref": "#/components/schemas/Artwork"
+                    },
+                    "similarity_score": {
+                        "type": "number",
+                        "title": "Similarity Score",
+                        "description": "Similarity score (0-1)"
+                    },
+                    "reasons": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Reasons",
+                        "description": "Reasons for recommendation"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "artwork",
+                    "similarity_score",
+                    "reasons"
+                ],
+                "title": "Recommendation",
+                "description": "Recommended artwork"
+            },
+            "RecommendationRequest": {
+                "properties": {
+                    "artwork_uri": {
+                        "type": "string",
+                        "title": "Artwork Uri",
+                        "description": "URI of the artwork to base recommendations on"
+                    },
+                    "max_results": {
+                        "type": "integer",
+                        "title": "Max Results",
+                        "description": "Maximum number of recommendations",
+                        "default": 10
+                    },
+                    "criteria": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Criteria",
+                        "description": "Criteria for recommendations"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "artwork_uri"
+                ],
+                "title": "RecommendationRequest",
+                "description": "Request for artwork recommendations"
+            },
+            "SPARQLQuery": {
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "title": "Query",
+                        "description": "SPARQL query string"
+                    },
+                    "output_format": {
+                        "type": "string",
+                        "title": "Output Format",
+                        "description": "Output format: json, xml, csv, tsv",
+                        "default": "json"
+                    },
+                    "reasoning": {
+                        "type": "boolean",
+                        "title": "Reasoning",
+                        "description": "Enable OWL reasoning",
+                        "default": false
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "query"
+                ],
+                "title": "SPARQLQuery",
+                "description": "SPARQL query request"
+            },
+            "SPARQLResult": {
+                "properties": {
+                    "results": {
+                        "additionalProperties": true,
+                        "type": "object",
+                        "title": "Results"
+                    },
+                    "query_time_ms": {
+                        "type": "number",
+                        "title": "Query Time Ms"
+                    },
+                    "result_count": {
+                        "type": "integer",
+                        "title": "Result Count"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "results",
+                    "query_time_ms",
+                    "result_count"
+                ],
+                "title": "SPARQLResult",
+                "description": "SPARQL query result"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}
