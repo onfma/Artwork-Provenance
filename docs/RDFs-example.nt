@@ -1,0 +1,79 @@
+########################
+## ARTWORK 
+########################
+
+<http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346> 
+        <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> 
+                <http://www.w3.org/ns/prov#Entity> .
+
+<http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346> 
+        <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> 
+                <http://www.cidoc-crm.org/cidoc-crm/E22_Man_Made_Object> .
+
+
+<http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346> 
+        <http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by> 
+                <http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346/identifier/num%C4%83r%20de%20inventar%3A%20F%20576> .
+
+<http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346> 
+        <http://www.cidoc-crm.org/cidoc-crm/P102_has_title> 
+                <http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346/title/Catedrala%20Romano-Catolic%C4%83%20din%20Alba%20Iulia%20-%20portalul%20de%20vest> .
+
+
+<http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346> 
+        <http://www.cidoc-crm.org/cidoc-crm/P2_has_type> 
+                <http://arp-greatteam.org/heritage-provenance/attributes/d4606e71-1d92-4709-8d83-1fba2c2a5362> .
+
+<http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346> 
+        <http://www.cidoc-crm.org/cidoc-crm/P45_consists_of> 
+                <http://arp-greatteam.org/heritage-provenance/attributes/45f02339-2a76-46a9-927f-40953bdb9616> .
+
+<http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346> 
+        <http://www.cidoc-crm.org/cidoc-crm/P15_was_influenced_by> 
+                <http://arp-greatteam.org/heritage-provenance/attributes/a4a58d76-de2a-4e7d-85a5-9b8bd82005b9> .
+
+<http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346> 
+        <http://xmlns.com/foaf/0.1/depiction> 
+                <https://clasate.cimec.ro/medium/imagini8/2f3993912cc145fea2789ed12feeccc3.jpg> .
+
+
+###########################################
+## EVENT creation of artwork 
+###########################################
+
+<http://arp-greatteam.org/heritage-provenance/event/c5772606-dbb7-4608-bf6c-77a574fa9f79> 
+        <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> 
+                <http://www.w3.org/ns/prov#Activity> .
+
+<http://arp-greatteam.org/heritage-provenance/event/c5772606-dbb7-4608-bf6c-77a574fa9f79> 
+        <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> 
+                <http://www.cidoc-crm.org/cidoc-crm/E12_Production> .
+
+<http://arp-greatteam.org/heritage-provenance/event/c5772606-dbb7-4608-bf6c-77a574fa9f79> 
+        <http://www.w3.org/2000/01/rdf-schema#label> 
+                "creation" .
+
+
+<http://arp-greatteam.org/heritage-provenance/event/c5772606-dbb7-4608-bf6c-77a574fa9f79> 
+        <http://www.cidoc-crm.org/cidoc-crm/P108_has_produced> 
+                <http://arp-greatteam.org/heritage-provenance/artwork/e689903c-2ec4-4b61-996e-9f7d52633346> .
+
+<http://arp-greatteam.org/heritage-provenance/event/c5772606-dbb7-4608-bf6c-77a574fa9f79> 
+        <http://www.cidoc-crm.org/cidoc-crm/P14_carried_out_by> 
+                <http://arp-greatteam.org/heritage-provenance/artist/01412a41-0610-44d4-950e-74fce5d42ac6> .
+
+<http://arp-greatteam.org/heritage-provenance/event/c5772606-dbb7-4608-bf6c-77a574fa9f79> 
+        <http://www.cidoc-crm.org/cidoc-crm/P7_took_place_at> 
+                <http://arp-greatteam.org/heritage-provenance/location/b61a4e0f-a1c4-4ea8-9f59-b1bb9ec201c6> .
+
+<http://arp-greatteam.org/heritage-provenance/event/c5772606-dbb7-4608-bf6c-77a574fa9f79> 
+        <http://www.cidoc-crm.org/cidoc-crm/P4_has_time_span> 
+                "secolul XX" .
+
+<http://arp-greatteam.org/heritage-provenance/event/c5772606-dbb7-4608-bf6c-77a574fa9f79> 
+        <http://www.cidoc-crm.org/cidoc-crm/P50i_is_currently_held_by> 
+                <http://arp-greatteam.org/heritage-provenance/attributes/ef36c9ed-4b90-4774-8a36-3ed5cf28b2fb> .
+
+<http://arp-greatteam.org/heritage-provenance/event/c5772606-dbb7-4608-bf6c-77a574fa9f79> 
+        <http://www.cidoc-crm.org/cidoc-crm/P109_has_current_or_former_curator> 
+                <http://arp-greatteam.org/heritage-provenance/attributes/937ffcff-203b-440d-862d-86caf06a2046> .

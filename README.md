@@ -1,248 +1,180 @@
 # Heritage Provenance System
 
-A comprehensive web platform for modeling and managing artwork provenance with integration to DBpedia, Wikidata, Getty vocabularies, Europeana, and Romanian cultural heritage.
+A comprehensive full-stack web application for modeling, managing, and visualizing artwork provenance using Semantic Web technologies and RDF. The system integrates with Wikidata, Getty Vocabularies, and Romanian heritage data to provide rich contextual information about artworks, artists, and their historical existence.
 
-## Features
+## 🎨 Features
 
-- **Artwork Management**: Complete CRUD operations for artworks with rich metadata
-- **Provenance Tracking**: Full provenance chain tracking with events, agents, and locations
-- **SPARQL Endpoint**: Query interface for RDF data with federated query support
-- **External Integration**: 
-  - DBpedia: Artist and artwork information
-  - Wikidata: Linked data enrichment
-  - Getty Vocabularies (AAT, ULAN, TGN): Controlled vocabularies
-  - Europeana: European cultural heritage datasets
-  - Romanian Heritage: Special integration for Romanian museums
-- **Visualizations**: Interactive charts, network graphs, and geographic maps
-- **Recommendation Engine**: Discover similar artworks based on multiple criteria
-- **Semantic Web**: Built on CIDOC-CRM ontology with RDF/OWL support
+### Core Functionality
+- **Artwork Management**: Track artworks with detailed metadata
+- **Artist Profiles**: Manage artist information with external data enrichment
+- **Provenance Tracking**: Document complete ownership and location history of artworks
+- **SPARQL Endpoint**: Query the RDF knowledge graph using SPARQL
+- **Visualization**: Interactive network graphs and timeline visualizations
+- **Recommendations**: ML-powered artwork recommendations based on similarity
 
-## Architecture
+### Semantic Web Integration
+- **CIDOC-CRM Ontology**: Industry-standard cultural heritage modeling
+- **PROV-O**: W3C provenance ontology for tracking artwork history
+- **RDF Triple Store**: Knowledge graph storage using RDFLib
+- **External Data Sources**:
+  - Wikidata for additional contextual data
+  - Getty AAT (Art & Architecture Thesaurus) for terminology
+- **Romanian Heritage Data**: Preloaded cultural heritage dataset
 
-```
-Artwork-Provenance/
-├── backend/                 # FastAPI backend
-│   ├── app/
-│   │   ├── main.py         # FastAPI application
-│   │   ├── config.py       # Configuration settings
-│   │   ├── models.py       # Pydantic models
-│   │   ├── routers/        # API endpoints
-│   │   │   ├── artworks.py
-│   │   │   ├── provenance.py
-│   │   │   ├── sparql.py
-│   │   │   ├── recommendations.py
-│   │   │   └── visualization.py
-│   │   └── services/       # Business logic
-│   │       ├── rdf_store.py
-│   │       ├── external_data.py
-│   │       └── recommendations.py
-│   ├── data/               # Data storage
-│   ├── ontology/           # OWL ontologies
-│   │   ├── cidoc_crm.owl
-│   │   └── provenance-ontology.owl
-│   └── requirements.txt
-├── frontend/               # React frontend
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── pages/          # Page components
-│   │   ├── api.js          # API client
-│   │   └── main.jsx
-│   └── package.json
-└── docs/                   # Documentation
+## 🏗️ Architecture
 
-```
+### Backend
+- **Framework**: FastAPI (Python)
+- **RDF Store**: RDFLib with support for Virtuoso and GraphDB
+- **APIs**: RESTful endpoints + SPARQL query interface
+- **ML**: scikit-learn for recommendation engine
 
-## Installation
+### Frontend
+- **Framework**: React 18 with React Router
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **Visualization**: 
+  - Plotly.js for charts
+  - vis-network for graph visualization
+  - Leaflet for maps
+- **State Management**: TanStack Query (React Query)
+- **UI Components**: Headless UI + Heroicons
+
+## 📋 Prerequisites
+
+- **Python**: 3.9+
+- **Node.js**: 18+
+- **Redis**: 6.0+ (optional, for caching)
+- **Docker**: For containerized deployment
+
+## 🚀 Getting Started
 
 ### Backend Setup
 
-1. **Create Python virtual environment**:
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # Linux/Mac
-```
+1. **Navigate to backend directory**
+   ```bash
+   cd backend
+   ```
 
-2. **Install dependencies**:
-```bash
-pip install -r requirements.txt
-```
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-3. **Configure environment**:
-```bash
-copy .env.example .env
-# Edit .env with your settings
-```
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-4. **Run the backend**:
-```bash
-python -m app.main
-```
+4. **Configure environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
 
-The API will be available at `http://localhost:8000`
-- API Documentation: `http://localhost:8000/api/docs`
-- SPARQL Endpoint: `http://localhost:8000/api/sparql/query`
+5. **Import Romanian heritage data (optional)**
+   ```bash
+   python scripts/import_romanian_heritage.py
+   ```
+
+6. **Run the backend server**
+   ```bash
+   python -m app.main
+   ```
+
+   The API will be available at `http://localhost:8000`
+   - API Documentation: `http://localhost:8000/api/docs`
+   - OpenAPI Spec: `http://localhost:8000/api/openapi.json`
 
 ### Frontend Setup
 
-1. **Install dependencies**:
-```bash
-cd frontend
-npm install
-```
+1. **Navigate to frontend directory**
+   ```bash
+   cd frontend
+   ```
 
-2. **Configure environment**:
-```bash
-copy .env.example .env
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-3. **Run development server**:
-```bash
-npm run dev
-```
+3. **Configure environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with backend URL if different from default
+   ```
 
-The frontend will be available at `http://localhost:3000`
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-## Usage
+   The frontend will be available at `http://localhost:3000`
 
-### REST API
+## 📚 API Endpoints
 
-#### Artworks
+### Artworks
 - `GET /api/artworks` - List all artworks
-- `POST /api/artworks` - Create new artwork
 - `GET /api/artworks/{id}` - Get artwork details
-- `PUT /api/artworks/{id}` - Update artwork
-- `DELETE /api/artworks/{id}` - Delete artwork
-- `GET /api/artworks/{id}/enrich?source=wikidata` - Enrich from external sources
 
-#### Provenance
-- `GET /api/provenance/{artwork_id}/chain` - Get provenance chain
-- `POST /api/provenance/{artwork_id}/events` - Add provenance event
-- `GET /api/provenance/timeline/{artwork_id}` - Get timeline visualization
+### Artists
+- `GET /api/artists` - List all artists
+- `GET /api/artists/{id}` - Get artist details
 
-#### SPARQL
+### Provenance
+- `GET /api/provenance/{artwork_id}` - Get provenance chain
+- `GET /api/provenance/{event_id}` - Get provenance event
+
+### Locations
+- `GET /api/locations` - List locations
+- `GET /api/locations/{id}` - Get location details
+
+### SPARQL
 - `POST /api/sparql/query` - Execute SPARQL query
-- `GET /api/sparql/examples` - Get example queries
-- `GET /api/sparql/statistics` - Get collection statistics
-- `GET /api/sparql/federated/dbpedia` - Query DBpedia
-- `GET /api/sparql/federated/wikidata` - Query Wikidata
 
-#### Recommendations
+### Recommendations
 - `GET /api/recommendations/{artwork_id}` - Get similar artworks
-- `GET /api/recommendations/{artwork_id}/similar-provenance` - Find similar provenance
 
-#### Visualizations
-- `GET /api/visualization/statistics/overview` - Overview statistics
-- `GET /api/visualization/statistics/by-type` - Artworks by type
-- `GET /api/visualization/statistics/by-century` - Artworks by century
-- `GET /api/visualization/statistics/top-artists` - Top artists
-- `GET /api/visualization/network/provenance/{artwork_id}` - Provenance network
-- `GET /api/visualization/map/locations` - Geographic map data
+### Visualization
+- `GET /api/visualization/statistics/overview` - Get overview statistics (total artworks, artists, events, locations)
+- `GET /api/visualization/statistics/by-type` - Get distribution of artworks by type
+- `GET /api/visualization/statistics/by-material` - Get distribution of artworks by material
+- `GET /api/visualization/statistics/top-artists` - Get top artists by number of artworks
+- `GET /api/visualization/statistics/top-locations` - Get top locations by number of artworks
+- `GET /api/visualization/statistics/network/artists/{artist_id}` - Get artist relationship network from Getty
+- `GET /api/visualization/map/locations` - Get map visualization data for artwork locations
 
-### SPARQL Examples
+## 🗄️ Data Model
 
-**List all artworks:**
-```sparql
-PREFIX hp: <http://arp-greatteam.org/heritage-provenance#>
-PREFIX dcterms: <http://purl.org/dc/terms/>
+The system uses CIDOC-CRM for cultural heritage modeling:
 
-SELECT ?artwork ?title ?artist
-WHERE {
-    ?artwork a hp:ArtisticWork ;
-             dcterms:title ?title .
-    OPTIONAL { ?artwork dcterms:creator ?artist }
-}
-```
+- **E22_Man-Made_Object**: Artworks
+- **E21_Person**: Artists and owners
+- **E53_Place**: Galleries, museums, locations
+- **E8_Acquisition**: Provenance events
+- **E52_Time-Span**: Temporal information
 
-**Provenance chain:**
-```sparql
-PREFIX hp: <http://arp-greatteam.org/heritage-provenance#>
+## 📖 Documentation
 
-SELECT ?event ?eventType ?date ?fromAgent ?toAgent
-WHERE {
-    <artwork-uri> hp:hasProvenanceEvent ?event .
-    ?event hp:eventType ?eventType ;
-           dcterms:date ?date .
-    OPTIONAL { ?event hp:fromAgent ?fromAgent }
-    OPTIONAL { ?event hp:toAgent ?toAgent }
-}
-ORDER BY ?date
-```
+- **Project Documentation**: See `docs/sholarly.html`
+- **System Diagram**: See `docs/diagram.jpg`
+- **API Documentation**: Available at `/api/docs` when running the backend
+- **OpenAPI Specification**: See `docs/openapi.json` or `docs/OPENAPI.md`
+- **Entities examples**:
+   - pre parsed RDF data: `docs/entity-example.xml`
+   - RDF data: `docs/RDFs-example.nt`
+- **Ontologies**: 
+  - CIDOC-CRM: `backend/ontology/cidoc_crm.owl`
+  - PROV-O: `backend/ontology/prov-o.owl`
 
-## Technology Stack
+## 🎯 Use Cases
 
-### Backend
-- **FastAPI**: Modern Python web framework
-- **RDFLib**: RDF processing and SPARQL queries
-- **SPARQLWrapper**: Federated SPARQL queries
-- **scikit-learn**: Recommendation engine
-- **Pydantic**: Data validation
+1. **Museum Collections Management**: Track artwork provenance and location
+2. **Research**: Query cultural heritage data using SPARQL
+3. **Discovery**: Find similar artworks using ML recommendations
+4. **Visualization**: Explore artwork relationships and timelines
 
-### Frontend
-- **React**: UI framework
-- **Vite**: Build tool
-- **TailwindCSS**: Styling
-- **React Query**: Data fetching
-- **Plotly.js**: Visualizations
-- **Leaflet**: Maps
+## 👥 Authors
 
-### Ontologies & Standards
-- **CIDOC-CRM**: Cultural heritage conceptual reference model
-- **W3C PROV**: Provenance ontology
-- **Getty Vocabularies**: AAT, ULAN, TGN
-- **Dublin Core**: Metadata terms
-
-## Data Sources
-
-1. **DBpedia** (`https://dbpedia.org/sparql`): Artist biographies, artwork information
-2. **Wikidata** (`https://query.wikidata.org/sparql`): Linked open data
-3. **Getty AAT**: Art & Architecture Thesaurus
-4. **Getty ULAN**: Union List of Artist Names
-5. **Getty TGN**: Thesaurus of Geographic Names
-6. **Europeana**: European cultural heritage collections
-7. **Romanian Heritage**: National museums and INP data
-
-## Development
-
-### Adding a New Artwork
-```python
-import requests
-
-artwork = {
-    "title": "Portrait",
-    "title_ro": "Portret",
-    "artist_name": "Nicolae Grigorescu",
-    "creation_date": "1880-01-01",
-    "artwork_type": "painting",
-    "romanian_heritage": True,
-    "wikidata_id": "Q123456"
-}
-
-response = requests.post("http://localhost:8000/api/artworks", json=artwork)
-```
-
-### Running Tests
-```bash
-cd backend
-pytest
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## License
-
-MIT License
-
-## Contact
-
-For questions or support, please open an issue on GitHub.
-
----
-
-**Start scope**: Show the provenance chain of a single Romanian painting and link its artist and current location to Wikidata.
+Great Team (Tehnologii Web 2 - Ianuarie 2026)

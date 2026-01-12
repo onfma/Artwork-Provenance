@@ -1,0 +1,32 @@
+<edm:ProvidedCHO  rdf:about="Clasate#0002be24f52e44e78e0a932f7dd5761b">
+    <dc:identifier>număr de inventar: 939778</dc:identifier>
+    <dc:title xml:lang="ro">Soldat (Dorobanț la atac)</dc:title>
+    <dc:type xml:lang="ro">desen</dc:type>
+    <dc:type rdf:resource='http://vocab.getty.edu/aat/300033973'/>
+    <dc:type xml:lang="ro">categoria: Grafică</dc:type>
+    <dc:type xml:lang="ro">genul: Scenă de luptă</dc:type>
+    <dc:type xml:lang="ro">subtipul: Proiect compoziție</dc:type>
+    <dc:creator>Grigorescu, Nicolae</dc:creator>
+    <dc:creator rdf:resource='http://vocab.getty.edu/ulan/500028434'/>
+    <dc:subject xml:lang="ro">Școală românească (școală)</dc:subject>
+    <dc:subject rdf:resource='http://vocab.getty.edu/aat/300266106'/>
+    <dc:description xml:lang="ro">Grigorescu a urmat convoaiele armatei române pe parcursul Războiului de independență, participând la bătăliile de la Grivița, Smârdan sau Plevna. Stilul său de lucru se transformă radical după acest episod. Desenul devine sintetic și alert, ritmul acțiunilor se accelerează sub impactul evenimentelor. Este și cazul desenului în discuție, în care un dorobanț se pregătește să atace din tranșee. Probabil o schiță pentru o viitoare compoziție batalistă.</dc:description>
+    <dc:description xml:lang="ro">stil: Realism</dc:description>
+    <dc:description rdf:resource='http://vocab.getty.edu/aat/300172861'/>
+    <dcterms:created xml:lang="ro">1877</dcterms:created>
+    <dcterms:extent>0,172 x 0,230 m</dcterms:extent>
+    <dcterms:medium xml:lang="ro">cărbune pe hârtie</dcterms:medium>
+    <dcterms:medium rdf:resource='http://vocab.getty.edu/aat/300012862'/>
+    <dcterms:spatial xml:lang="ro">localitate de proveniență: Grivița</dcterms:spatial>
+    <dcterms:spatial xml:lang="ro">țară de proveniență: Bulgaria</dcterms:spatial>
+    <dcterms:spatial rdf:resource='http://vocab.getty.edu/tgn/7006413'/>
+    <edm:type>IMAGE</edm:type>
+</edm:ProvidedCHO>
+<ore:Aggregation rdf:about="#Clasate-0002be24f52e44e78e0a932f7dd5761b">
+    <edm:aggregatedCHO rdf:resource="Clasate#0002be24f52e44e78e0a932f7dd5761b" />
+    <edm:dataProvider xml:lang="ro">Muzeul Municipiului București - BUCUREȘTI</edm:dataProvider>
+    <edm:isShownAt rdf:resource="https://clasate.cimec.ro/detaliu.asp?k=0002be24f52e44e78e0a932f7dd5761b" />
+    <edm:isShownBy rdf:resource="https://clasate.cimec.ro/medium/imagini52/7ff7d4a9c6744c8bbc1a3e982bd32155.jpg" />
+    <edm:provider rdf:resource='http://www.wikidata.org/entity/Q18540950'/>
+    <edm:rights rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/" />
+</ore:Aggregation>
