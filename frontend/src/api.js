@@ -31,17 +31,16 @@ export const getProvenanceChain = (artworkId) => api.get(`/provenance/${artworkI
 // Visualization
 export const getOverviewStats = () => api.get('/visualization/statistics/overview')
 export const getArtworksByType = () => api.get('/visualization/statistics/by-type')
+export const getArtworksByMaterial = () => api.get('/visualization/statistics/by-material')
 export const getTopArtists = (limit) => api.get('/visualization/statistics/top-artists', { params: { limit } })
 export const getTopLocations = (limit) => api.get('/visualization/statistics/top-locations', { params: { limit } })
+export const getArtistNetwork = (artist_id) => api.get(`/visualization/statistics/network/artists/${artist_id}`)
 // export const getLocationMap = () => api.get('/visualization/map/locations')
 
 // SPARQL
 export const executeSPARQL = (data) => api.post('/sparql/query', data)
 export const getSPARQLExamples = () => api.get('/sparql/examples')
 export const getStatistics = () => api.get('/sparql/statistics')
-export const queryDBpedia = (query) => api.get('/sparql/federated/dbpedia', { params: { query } })
-export const queryWikidata = (query) => api.get('/sparql/federated/wikidata', { params: { query } })
-export const queryGetty = (query) => api.get('/sparql/federated/getty', { params: { query } })
 
 // Recommendations
 export const getRecommendations = (artworkId, params) => api.get(`/recommendations/${artworkId}`, { params })

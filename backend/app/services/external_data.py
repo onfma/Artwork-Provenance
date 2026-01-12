@@ -4,9 +4,10 @@ Integrates with Wikidata, Getty, and Romanian heritage sources
 """
 
 import httpx
+import aiohttp
 import structlog
 from app.config import settings
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 
@@ -121,31 +122,29 @@ class GettyService:
     
     async def get_location_parent(self, location_link: str) -> Optional[str]:
         """Get broader location from Getty TGN"""
-        
-        location_id = "tgn:" + location_link.split("/")[-1]
+ 
+        location_id = location_link.split("/")[-1]
         logger.debug(f"Getting broader location for Getty TGN ID: {location_id}")
         
         query = f"""
-        PREFIX tgn: <http://vocab.getty.edu/tgn/>
         PREFIX gvp: <http://vocab.getty.edu/ontology#>
+        PREFIX tgn: <http://vocab.getty.edu/tgn/>
 
         SELECT ?broaderLocation
         WHERE {{
-            {location_id} gvp:parentString ?broaderLocation .
+            tgn:{location_id} gvp:parentString ?broaderLocation .
         }}
         LIMIT 1
         """
         
         try:
-            # self.endpoint.setQuery(query)
-            # results = self.endpoint.query().convert()
-            # bindings = results.get("results", {}).get("bindings", [])
-            # logger.debug(f"Getty broader location query results: {bindings}")
-            
-            # if bindings:
-            #     broader_location = bindings[0]["broaderLocation"]["value"]
-            #     return broader_location
-            
+            self.endpoint.setQuery(query)
+            results = self.endpoint.query().convert()
+
+            location = results.get("results", {}).get("bindings", []).get[0].get("broaderLocation", {}).get("value", None)
+            if location:
+                return location
+                
             return None
         
         except Exception as e:
@@ -224,7 +223,11 @@ class GettyService:
         try:
             self.endpoint.setQuery(query)
             results = self.endpoint.query().convert()
-            return _results_formater(results)
+            results =  _results_formater(results)
+            if results["nodes"] or results["edges"]:
+                return results
+            else:
+                return {}
         except Exception as e:
             logger.error(f"Error querying Getty for artist network: {e}")
             return {}

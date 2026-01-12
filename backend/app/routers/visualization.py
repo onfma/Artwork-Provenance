@@ -139,6 +139,7 @@ async def get_artworks_by_material(request: Request, limit: int = Query(10, ge=1
                 crm:P45_consists_of ?material .
 
         ?material rdfs:label ?materialLabel .
+        FILTER(?materialLabel != "Unknown")
     }}
     GROUP BY ?material ?materialLabel
     ORDER BY DESC(?artwork_count)
@@ -262,12 +263,30 @@ async def get_location_map(request: Request):
     rdf_service = request.app.state.rdf_service
 
     continents = {
-        "Europe": {"lat": 54.5260, "lng": 15.2551},
-        "Asia": {"lat": 34.0479, "lng": 100.6197},
-        "Africa": {"lat": -8.7832, "lng": 34.5085},
-        "North America": {"lat": 54.5260, "lng": -105.2551},
-        "South America": {"lat": -8.7832, "lng": -55.4915},
-        "Australia": {"lat": -25.2744, "lng": 133.7751}
+        "Europe": {
+            "coords": {"lat": 54.5260, "lng": 15.2551},
+            "artworks_count": 0
+        },
+        "Asia": {
+            "coords": {"lat": 34.0479, "lng": 100.6197},
+            "artworks_count": 0
+        },
+        "Africa": {
+            "coords": {"lat": -8.7832, "lng": 34.5085},
+            "artworks_count": 0
+        },
+        "North America": {
+            "coords": {"lat": 54.5260, "lng": -105.2551},
+            "artworks_count": 0
+        },
+        "South America": {
+            "coords": {"lat": -8.7832, "lng": -55.4915},
+            "artworks_count": 0
+        },
+        "Australia": {
+            "coords": {"lat": -25.2744, "lng": 133.7751},
+            "artworks_count": 0
+        }
     }
     
     query = """
@@ -275,48 +294,47 @@ async def get_location_map(request: Request):
     PREFIX crm:  <http://www.cidoc-crm.org/cidoc-crm/>
     PREFIX owl:  <http://www.w3.org/2002/07/owl#>
     
-    SELECT ?location ?locationTGN (COUNT(?artwork) AS ?artworks_count)
+    SELECT ?location ?locationLabel ?locationTGN (COUNT(?artwork) AS ?artworks_count)
     WHERE {
         ?location a prov:Location ;
                   owl:sameAs ?locationTGN .
+        ?location rdfs:label ?locationLabel .
         FILTER(CONTAINS(STR(?locationTGN), "tgn"))
         
         ?event crm:P7_took_place_at ?location ;
                crm:P108_has_produced ?artwork .
     }
-    GROUP BY ?location ?locationTGN
+    GROUP BY ?location ?locationLabel ?locationTGN
     ORDER BY DESC(?artworks_count)
+    LIMIT 1
     """
     
     try:
         results = rdf_service.execute_sparql(query)
         
-        markers = []
         for row in results:
+            location_label = str(row.locationLabel)
             location_getty = str(row.locationTGN)
             artworks_count = int(row.artworks_count)
 
-            logger.debug(f"Processing location: {location_getty} with {artworks_count} artworks")
+            logger.debug(f"Processing location: {location_label}, {location_getty} with {artworks_count} artworks")
             
             broader_location = await getty.get_location_parent(location_getty)
-            # if broader_location and broader_location in continents:
-            #     coord = continents[broader_location]
-            #     markers.append({
-            #         "lat": coord["lat"],
-            #         "lng": coord["lng"],
-            #         "artworks_count": artworks_count
-            #     })
+            if broader_location:
+                for continent in continents:
+                    if continent in broader_location:
+                        continents[continent]["artworks_count"] += artworks_count
+                        break
 
         return {
             "map_type": "markers",
-            "markers": markers,
+            "markers": continents,
             "center": {"lat": 45.9432, "lng": 24.9668}  # Romania center
         }
         
     except Exception as e:
         logger.error(f"Error generating location map: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/statistics/network/artists/{artist_id}")
 async def get_network_artists(request: Request, artist_id: str):
@@ -331,7 +349,16 @@ async def get_network_artists(request: Request, artist_id: str):
         if artist_data is None or artist_data.get('getty') is None:
             return {"message": "No Getty link available for this artist."}
         
+        network = {}
+        
         network = await getty.get_artist_network(artist_data['getty'])
+        if network == {}:
+            return {"message": "No network data available from Getty for this artist."}
+        network["nodes"].append({
+            "id": artist_data['getty'].split("/")[-1],
+            "uri": artist_data['getty'],
+            "name": artist_data['name']
+        })
         return network 
         
     

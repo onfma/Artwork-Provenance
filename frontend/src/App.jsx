@@ -7,7 +7,6 @@ import ArtworkDetailPage from './pages/ArtworkDetailPage'
 import ProvenancePage from './pages/ProvenancePage'
 import SPARQLPage from './pages/SPARQLPage'
 import VisualizationPage from './pages/VisualizationPage'
-import RomanianHeritagePage from './pages/RomanianHeritagePage'
 
 function App() {
   return (

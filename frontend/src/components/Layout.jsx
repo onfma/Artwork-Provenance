@@ -4,8 +4,7 @@ import {
   HomeIcon, 
   RectangleStackIcon, 
   ChartBarIcon, 
-  CommandLineIcon,
-  MapIcon 
+  CommandLineIcon
 } from '@heroicons/react/24/outline'
 
 const Layout = ({ children }) => {
@@ -74,7 +73,7 @@ const Layout = ({ children }) => {
       <footer className="bg-gray-800 border-t border-gray-700 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center text-gray-400 text-sm">
-            <p>Integrated with DBpedia, Wikidata, Getty Vocabularies, Europeana & Romanian Heritage</p>
+            <p>Integrated with Wikidata, Getty Vocabularies & Romanian Heritage</p>
             <p className="mt-2">© 2026 Heritage Provenance System</p>
           </div>
         </div>

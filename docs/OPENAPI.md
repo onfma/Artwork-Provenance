@@ -180,16 +180,39 @@ curl -X GET "http://localhost:8000/api/recommendations/755567e9-bf30-4f70-a8f4-0
 
 ### Example 4: Discover a Artist's Network
 
-**Scenario**: A researcher wants to find what other artists inluenced ones work.
+**Scenario**: A researcher wants to explore an artist's professional network and discover relationships with other artists (teachers or students).
 
 ```bash
-curl -X POST "http://localhost:8000/api/visualization/statistics/network/artists/99b587b4-656b-42aa-9c0b-9cacdb515126" \
+curl -X POST "http://localhost:8000/api/visualization/statistics/network/artists/5a4d2e7f-4f3e-4574-8774-75db4883e2c1" \
   -H "accept: application/json" \
 ```
 
 **Response Example**:
 ```json
-
+{
+  "nodes": [
+    {
+      "id": "500019613",
+      "uri": "http://vocab.getty.edu/ulan/500019613",
+      "name": "Luchian, Ștefan"
+    },
+    {
+      "id": "500017470",
+      "uri": "http://vocab.getty.edu/ulan/500017470",
+      "name": "Petrascu, Gheorghe"
+    }
+  ],
+  "edges": [
+    {
+      "target": "500019613",
+      "relationship": "teacher_of"
+    },
+    {
+      "target": "500017470",
+      "relationship": "teacher_of"
+    }
+  ]
+}
 ```
 
 

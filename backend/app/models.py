@@ -159,36 +159,6 @@ class Artwork(BaseModel):
     updated_at: Optional[datetime] = None
 
 
-class ArtworkCreate(BaseModel):
-    """Model for creating a new artwork"""
-    title: str
-    title_ro: Optional[str] = None
-    artist_name: Optional[str] = None
-    artist_uri: Optional[str] = None
-    creation_date: Optional[str] = None
-    artwork_type: ArtworkType
-    medium: Optional[str] = None
-    dimensions: Optional[Dict[str, float]] = None
-    description: Optional[str] = None
-    description_ro: Optional[str] = None
-    current_location_name: Optional[str] = None
-    current_owner_name: Optional[str] = None
-    romanian_heritage: bool = False
-    wikidata_id: Optional[str] = None
-    dbpedia_uri: Optional[str] = None
-
-
-class ArtworkUpdate(BaseModel):
-    """Model for updating an artwork"""
-    title: Optional[str] = None
-    title_ro: Optional[str] = None
-    description: Optional[str] = None
-    description_ro: Optional[str] = None
-    medium: Optional[str] = None
-    dimensions: Optional[Dict[str, float]] = None
-    current_location_name: Optional[str] = None
-    current_owner_name: Optional[str] = None
-
 
 class SPARQLQuery(BaseModel):
     """SPARQL query request"""

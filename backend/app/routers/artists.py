@@ -19,7 +19,7 @@ getty = GettyService()
 async def list_artists(
     request: Request,
     location_id: str = Query(None, description="Filter by location ID where they created artworks"),
-    limit: int = Query(20, ge=1, le=100, description="Maximum number of results")
+    limit: int = Query(100, ge=1, description="Maximum number of results")
 ):
     """List all artists with optional filters"""
     

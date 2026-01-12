@@ -8,28 +8,18 @@ const SPARQLPage = () => {
   const [isExecuting, setIsExecuting] = useState(false)
   const [error, setError] = useState(null)
 
-  const { data: examples } = useQuery({
-    queryKey: ['sparqlExamples'],
-    queryFn: () => getSPARQLExamples().then(res => res.data)
-  })
 
   const executeQuery = async () => {
     setIsExecuting(true)
     setError(null)
     try {
-      const response = await executeSPARQL({ query, output_format: 'json' })
+      const response = await executeSPARQL({ query})
       setResults(response.data)
     } catch (err) {
       setError(err.response?.data?.detail || err.message)
     } finally {
       setIsExecuting(false)
     }
-  }
-
-  const loadExample = (exampleQuery) => {
-    setQuery(exampleQuery.trim())
-    setResults(null)
-    setError(null)
   }
 
   return (
@@ -46,7 +36,6 @@ const SPARQLPage = () => {
         </a>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Query Editor */}
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
@@ -119,48 +108,6 @@ const SPARQLPage = () => {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Examples Sidebar */}
-        <div className="space-y-4">
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-            <h3 className="text-lg font-semibold text-white mb-4">Example Queries</h3>
-            {examples?.examples && (
-              <div className="space-y-2">
-                {Object.entries(examples.examples).map(([key, exampleQuery]) => (
-                  <button
-                    key={key}
-                    onClick={() => loadExample(exampleQuery)}
-                    className="w-full text-left px-3 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 hover:text-white transition text-sm"
-                  >
-                    {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-            <h3 className="text-lg font-semibold text-white mb-3">Federated Queries</h3>
-            <p className="text-sm text-gray-400 mb-3">
-              Query external endpoints:
-            </p>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center space-x-2">
-                <span className="text-indigo-400">•</span>
-                <span className="text-gray-300">DBpedia</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-indigo-400">•</span>
-                <span className="text-gray-300">Wikidata</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-indigo-400">•</span>
-                <span className="text-gray-300">Getty Vocabularies</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )

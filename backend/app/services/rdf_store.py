@@ -496,7 +496,7 @@ class RDFStoreService:
             return None
 
 
-    def get_all_artists(self, filters: Dict[str, str] = None, limit: int = 20) -> list:
+    def get_all_artists(self, filters: Dict[str, str] = None, limit: int = None) -> list:
         """Query all artists from RDF store with optional filters"""
         
         filter_clauses = ""
@@ -521,7 +521,6 @@ class RDFStoreService:
             OPTIONAL {{ ?artist owl:sameAs ?ulan . FILTER(CONTAINS(STR(?ulan), "ulan")) }}
         }}
         ORDER BY ?name
-        LIMIT {limit}
         """
         
         try:
