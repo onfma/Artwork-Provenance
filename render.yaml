@@ -4,14 +4,12 @@ services:
     name: artwork-provenance-backend
     runtime: docker
     plan: free
-    region: frankfurt # Choose a region close to you (e.g., oregon, ohio, frankfurt, singapore)
+    region: frankfurt
     dockerContext: backend
     dockerfilePath: backend/Dockerfile
     envVars:
       - key: PORT
         value: 8000
-      - key: ALLOWED_ORIGINS
-        value: '["*"]' # Must be a JSON list string for Pydantic to parse correctly
     # Health check ensures the app is running before switching traffic
     healthCheckPath: /api/docs 
     autoDeploy: true
