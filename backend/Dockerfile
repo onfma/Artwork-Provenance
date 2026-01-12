@@ -23,4 +23,4 @@ RUN python scripts/import_romanian_heritage.py
 EXPOSE 8000
 
 # Command to run the app (Update 'app.main:app' to your actual entry point)
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080", "--proxy-headers", "--forwarded-allow-ips", "*"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
