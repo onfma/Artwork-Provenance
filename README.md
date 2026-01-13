@@ -2,6 +2,8 @@
 
 A comprehensive full-stack web application for modeling, managing, and visualizing artwork provenance using Semantic Web technologies and RDF. The system integrates with Wikidata, Getty Vocabularies, and Romanian heritage data to provide rich contextual information about artworks, artists, and their historical existence.
 
+[Watch Project Presentation (Video)](prezWeb.mp4)
+
 ## 🎨 Features
 
 ### Core Functionality
